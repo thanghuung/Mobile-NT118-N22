@@ -1,15 +1,14 @@
-import 'package:app/views/register_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class RegisterView extends StatefulWidget {
+  const RegisterView({super.key});
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<RegisterView> createState() => _RegisterViewState();
 }
 
-class _LoginViewState extends State<LoginView> {
+class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
 
@@ -30,7 +29,9 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  AppBar(title: const Text('Login'),),
+      appBar: AppBar(
+        title: const Text('Register View'),
+      ),
       body: Column(
         children: [
           TextField(
@@ -38,7 +39,8 @@ class _LoginViewState extends State<LoginView> {
             enableSuggestions: false,
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(hintText: 'Enter your email here'),
+            decoration:
+                const InputDecoration(hintText: 'Enter your email here'),
           ),
           TextField(
             controller: _password,
@@ -54,24 +56,27 @@ class _LoginViewState extends State<LoginView> {
               final password = _password.text;
               try {
                 final UserCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(email: email, password: password);
+                    .createUserWithEmailAndPassword(
+                        email: email, password: password);
                 print(UserCredential);
               } on FirebaseAuthException catch (e) {
-                if (e.code == 'unknown') {
-                  print('Không tìm thấy người dùng');
-                } else if (e.code == 'wrong-password') {
-                  print('Sai mật khẩu');
+                if (e.code == 'weak-password') {
+                  print('Mật khẩu yếu');
+                } else if (e.code == 'email-already-in-use') {
+                  print('Email này đã được sử dụng');
+                } else if (e.code == 'invalid-email') {
+                  print('Email không hợp lệ');
                 }
               }
             },
-            child: const Text('Login'),
+            child: const Text('Register'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pushNamedAndRemoveUntil('/register/', (route) => false);
+              Navigator.of(context).pushNamedAndRemoveUntil('/login/', (route) => false);
             },
-            child: const Text('Not register yet? Register here.'),
-          )
+            child: Text('Back to Login'),
+          ),
         ],
       ),
     );
