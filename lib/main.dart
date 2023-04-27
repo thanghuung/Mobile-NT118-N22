@@ -2,6 +2,7 @@ import 'package:app/firebase_options.dart';
 import 'package:app/views/login_view.dart';
 import 'package:app/views/register_view.dart';
 import 'package:app/views/verify_email_view.dart';
+import 'package:app/component/BottomNavBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

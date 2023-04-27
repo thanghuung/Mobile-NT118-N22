@@ -1,6 +1,10 @@
-import 'package:app/views/register_view.dart';
+import 'dart:math';
+import 'package:app/common.dart';
+import 'package:app/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:app/AppColors.dart';
+import 'package:email_validator/email_validator.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -12,6 +16,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
+  bool _obscureText = true;
 
   @override
   void initState() {
@@ -30,49 +35,203 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  AppBar(title: const Text('Login'),),
       body: Column(
         children: [
-          TextField(
-            controller: _email,
-            enableSuggestions: false,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(hintText: 'Enter your email here'),
+          Container(
+            padding: const EdgeInsets.only(top: 50),
+            child: RichText(
+              text: const TextSpan(
+                style: TextStyle(fontSize: 24.0),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: 'Todo',
+                    style: TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.pink),
+                  ),
+                  TextSpan(
+                    text: 'os',
+                    style: TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.purple),
+                  ),
+                ],
+              ),
+            ),
           ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration:
-                const InputDecoration(hintText: 'Enter your password here'),
+          Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: const Center(
+                child: Text(
+                  'Đăng nhập bằng Email',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              )),
+          Container(
+            padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Email',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                  child: TextField(
+                    controller: _email,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      hintText: 'Nhập email',
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                final UserCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(email: email, password: password);
-                print(UserCredential);
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'unknown') {
-                  print('Không tìm thấy người dùng');
-                } else if (e.code == 'wrong-password') {
-                  print('Sai mật khẩu');
+          Container(
+            padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Mật khẩu',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                  child: TextField(
+                    controller: _password,
+                    obscureText: _obscureText,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    decoration: InputDecoration(
+                      hintText: 'Nhập mật khẩu',
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        borderSide: BorderSide.none,
+                      ),
+                      suffixIcon: IconButton(
+                        hoverColor: Colors.transparent,
+                        splashColor: Colors.transparent,
+                        icon: Icon(_obscureText
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
+            child: TextButton(
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
+
+                if (email.isEmpty || password.isEmpty) {
+                  showToast("Vui lòng nhập đầy đủ email và password");
+                  return;
                 }
-              }
-            },
-            child: const Text('Login'),
+
+                if (!isValidEmail(email)) {
+                  showToast("Sai định dạng email");
+                  return;
+                }
+                try {
+                  final UserCredential = await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: email, password: password);
+                  print(UserCredential);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => NoteView()),
+                  );
+                  showToast('Đăng nhập thành công');
+                } on FirebaseAuthException catch (e) {
+                  if (e.code == 'user-not-found') {
+                    showToast("Không tìm thấy người dùng!");
+                  } else if (e.code == 'wrong-password') {
+                    showToast("Sai mật khẩu!");
+                  }
+                }
+              },
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(AppColors.pink),
+                minimumSize: MaterialStateProperty.all<Size>(
+                    const Size(double.infinity, 60)),
+              ),
+              child: const Text('Đăng nhập', style: TextStyle(fontSize: 18)),
+            ),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pushNamedAndRemoveUntil('/register/', (route) => false);
-            },
-            child: const Text('Not register yet? Register here.'),
-          )
+          Container(
+            padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
+            child: TextButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/register/', (route) => false);
+              },
+              child: RichText(
+                text: const TextSpan(
+                  text: 'Chưa có tài khoản? ',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: 'Đăng ký ngay',
+                      style: TextStyle(
+                        color: AppColors.pinkTertiary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(15.0),
+        child: const Text(
+          'Developed by Todoos - 2023',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12.0, color: Colors.black),
+        ),
       ),
     );
   }
