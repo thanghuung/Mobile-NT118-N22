@@ -1,8 +1,10 @@
 import 'package:app/common.dart';
+import 'package:app/constants/routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:app/AppColors.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:developer' as devtools show log;
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -228,7 +230,7 @@ class _RegisterViewState extends State<RegisterView> {
                           email: email, password: password);
                   print(UserCredential);
                   Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/login/', (route) => false);
+                      .pushNamedAndRemoveUntil(loginRoute, (route) => false);
                   showToast('Tạo tài khoản thành công');
                 } on FirebaseAuthException catch (e) {
                   if (e.code == 'weak-password') {
@@ -255,7 +257,7 @@ class _RegisterViewState extends State<RegisterView> {
             child: TextButton(
               onPressed: () {
                 Navigator.of(context)
-                    .pushNamedAndRemoveUntil('/login/', (route) => false);
+                    .pushNamedAndRemoveUntil(loginRoute, (route) => false);
               },
               child: RichText(
                 text: const TextSpan(

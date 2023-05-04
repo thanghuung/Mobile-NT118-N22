@@ -1,10 +1,13 @@
 import 'dart:math';
 import 'package:app/common.dart';
+import 'package:app/component/show_error_Dialog.dart';
+import 'package:app/constants/routes.dart';
 import 'package:app/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:app/AppColors.dart';
 import 'package:email_validator/email_validator.dart';
+import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -168,21 +171,40 @@ class _LoginViewState extends State<LoginView> {
                   return;
                 }
                 try {
-                  final UserCredential = await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(
-                          email: email, password: password);
-                  print(UserCredential);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => NoteView()),
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    email: email,
+                    password: password,
                   );
-                  showToast('Đăng nhập thành công');
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    notesRoute,
+                    (route) => false,
+                  );
+                  // showToast('Đăng nhập thành công');
                 } on FirebaseAuthException catch (e) {
                   if (e.code == 'user-not-found') {
-                    showToast("Không tìm thấy người dùng!");
+                    // showToast("Không tìm thấy người dùng!");
+                    await showErrorDialog(
+                      context,
+                      'Không tìm thấy người dùng!',
+                    );
                   } else if (e.code == 'wrong-password') {
-                    showToast("Sai mật khẩu!");
+                    // showToast("Sai mật khẩu!");
+                    await showErrorDialog(
+                      context,
+                      'Sai mật khẩu',
+                    );
+                  } else {
+                    await showErrorDialog(
+                      context,
+                      'Error: ${e.code}',
+                    );
                   }
+                }
+                catch (e) {
+                  await showErrorDialog(
+                      context,
+                      e.toString(),
+                    );
                 }
               },
               style: ButtonStyle(
@@ -200,7 +222,7 @@ class _LoginViewState extends State<LoginView> {
             child: TextButton(
               onPressed: () {
                 Navigator.of(context)
-                    .pushNamedAndRemoveUntil('/register/', (route) => false);
+                    .pushNamedAndRemoveUntil(registerRoute, (route) => false);
               },
               child: RichText(
                 text: const TextSpan(
