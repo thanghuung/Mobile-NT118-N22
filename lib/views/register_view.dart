@@ -1,10 +1,11 @@
 import 'package:app/common.dart';
+import 'package:app/component/show_error_Dialog.dart';
 import 'package:app/constants/routes.dart';
+import 'package:app/services/auth/auth_exceptions.dart';
+import 'package:app/services/auth/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:app/AppColors.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'dart:developer' as devtools show log;
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -206,40 +207,88 @@ class _RegisterViewState extends State<RegisterView> {
               onPressed: () async {
                 final email = _email.text;
                 final password = _password.text;
-                final confirmPassword = _confirmPassword.text;
+                // final confirmPassword = _confirmPassword.text;
 
-                if (email.isEmpty ||
-                    password.isEmpty ||
-                    confirmPassword.isEmpty) {
-                  showToast("Vui lòng nhập đầy đủ thông tin");
-                  return;
-                }
+                // if (email.isEmpty ||
+                //     password.isEmpty ||
+                //     confirmPassword.isEmpty) {
+                //   showToast("Vui lòng nhập đầy đủ thông tin");
+                //   return;
+                // }
 
-                if (!isValidEmail(email)) {
-                  showToast("Sai định dạng email");
-                  return;
-                }
+                // if (!isValidEmail(email)) {
+                //   showToast("Sai định dạng email");
+                //   return;
+                // }
 
-                if (confirmPassword != password) {
-                  showToast("Mật khẩu không trùng khớp");
-                  return;
-                }
+                // if (confirmPassword != password) {
+                //   showToast("Mật khẩu không trùng khớp");
+                //   return;
+                // }
+                // try {
+                //   AuthService.firebase().createUser(
+                //     email: email,
+                //     password: password,
+                //   );
+                //   AuthService.firebase().sendEmailVerification();
+                //   Navigator.of(context).pushNamed(verifyEmailRoute);
+                // } on WeakPasswordAuthException {
+                //   await showErrorDialog(
+                //     context,
+                //     'Mật khẩu yếu!',
+                //   );
+                // } on EmailAlreadyInUseAuthException {
+                //   await showErrorDialog(
+                //     context,
+                //     'Email này đã được sử dụng!',
+                //   );
+                // } on InvalidEmailAuthException {
+                //   await showErrorDialog(
+                //     context,
+                //     'Email không hợp lệ!',
+                //   );
+                // } on GenericAuthException {
+                //   await showErrorDialog(
+                //     context,
+                //     'Đăng ký thất bại!',
+                //   );
+                // }
+
                 try {
-                  final UserCredential = await FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
-                          email: email, password: password);
-                  print(UserCredential);
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(loginRoute, (route) => false);
-                  showToast('Tạo tài khoản thành công');
+                  await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    email: email,
+                    password: password,
+                  );
+                  final user = FirebaseAuth.instance.currentUser;
+                  await user?.sendEmailVerification();
+                  Navigator.of(context).pushNamed(verifyEmailRoute);
                 } on FirebaseAuthException catch (e) {
                   if (e.code == 'weak-password') {
-                    showToast('Mật khẩu yếu');
+                    await showErrorDialog(
+                      context,
+                      'Mật khẩu yếu!',
+                    );
                   } else if (e.code == 'email-already-in-use') {
-                    showToast('Email này đã được sử dụng');
+                    await showErrorDialog(
+                      context,
+                      'Email này đã được sử dụng!',
+                    );
                   } else if (e.code == 'invalid-email') {
-                    showToast('Email không hợp lệ');
+                    await showErrorDialog(
+                      context,
+                      'Email không hợp lệ!',
+                    );
+                  } else {
+                    await showErrorDialog(
+                      context,
+                      'Error ${e.code}',
+                    );
                   }
+                } catch (e) {
+                  await showErrorDialog(
+                    context,
+                    e.toString(),
+                  );
                 }
               },
               style: ButtonStyle(

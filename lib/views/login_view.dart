@@ -1,13 +1,9 @@
-import 'dart:math';
-import 'package:app/common.dart';
 import 'package:app/component/show_error_Dialog.dart';
 import 'package:app/constants/routes.dart';
-import 'package:app/main.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:app/services/auth/auth_exceptions.dart';
+import 'package:app/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:app/AppColors.dart';
-import 'package:email_validator/email_validator.dart';
-import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -160,51 +156,41 @@ class _LoginViewState extends State<LoginView> {
               onPressed: () async {
                 final email = _email.text;
                 final password = _password.text;
-
-                if (email.isEmpty || password.isEmpty) {
-                  showToast("Vui lòng nhập đầy đủ email và password");
-                  return;
-                }
-
-                if (!isValidEmail(email)) {
-                  showToast("Sai định dạng email");
-                  return;
-                }
                 try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  await AuthService.firebase().logIn(
                     email: email,
                     password: password,
                   );
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    notesRoute,
-                    (route) => false,
-                  );
-                  // showToast('Đăng nhập thành công');
-                } on FirebaseAuthException catch (e) {
-                  if (e.code == 'user-not-found') {
-                    // showToast("Không tìm thấy người dùng!");
-                    await showErrorDialog(
-                      context,
-                      'Không tìm thấy người dùng!',
-                    );
-                  } else if (e.code == 'wrong-password') {
-                    // showToast("Sai mật khẩu!");
-                    await showErrorDialog(
-                      context,
-                      'Sai mật khẩu',
+
+                  final user = AuthService.firebase().currentUser;
+                  if (user?.isEmailVerified ?? false) {
+                    // user's email is verified
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      notesRoute,
+                      (route) => false,
                     );
                   } else {
-                    await showErrorDialog(
-                      context,
-                      'Error: ${e.code}',
+                    //user's email is not verified
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      verifyEmailRoute,
+                      (route) => false,
                     );
                   }
-                }
-                catch (e) {
+                } on UserNotFoundAuthException {
                   await showErrorDialog(
-                      context,
-                      e.toString(),
-                    );
+                    context,
+                    'Không tìm thấy người dùng!',
+                  );
+                } on WrongPasswordAuthException {
+                  await showErrorDialog(
+                    context,
+                    'Sai mật khẩu',
+                  );
+                } on GenericAuthException {
+                  await showErrorDialog(
+                    context,
+                    'Lỗi xác thực',
+                  );
                 }
               },
               style: ButtonStyle(
