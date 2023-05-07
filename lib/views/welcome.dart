@@ -1,3 +1,4 @@
+import 'package:app/AppColors.dart';
 import 'package:app/constants/routes.dart';
 import 'package:app/views/register_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,52 +32,116 @@ class _WelcomeState extends State<Welcome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          TextField(
-            controller: _email,
-            enableSuggestions: false,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration:
-                const InputDecoration(hintText: 'Enter your email here'),
+        body: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.only(top: 50),
+              child: const Center(
+                child: Text(
+                  'Xin chào!',
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.only(top: 10),
+              child: RichText(
+                  text: const TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Đăng nhập vào ',
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: 'Todo',
+                    style: TextStyle(
+                        color: AppColors.pink,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: 'os',
+                    style: TextStyle(
+                        color: AppColors.purple,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              )),
+            ),
+            const SizedBox(height: 20), // Khoảng cách giữa chữ và hình
+            Image.asset(
+              'assets/images/login.png', // Đường dẫn đến bức hình
+              width: 300, // Chiều rộng của hình
+              height: 300, // Chiều cao của hình
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
+              child: TextButton.icon(
+                onPressed: () {
+                  // Xử lý khi bấm nút "Đăng nhập với Google"
+                },
+                icon: const Icon(
+                  Icons.login,
+                  color: AppColors.orange,
+                ),
+                label: const Text('Đăng nhập với Google',
+                    style: TextStyle(
+                      color: AppColors.orange, // Màu chữ
+                      fontSize: 18, // Kích thước font
+                    )),
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(AppColors.orangeSecond),
+                  minimumSize: MaterialStateProperty.all<Size>(
+                      const Size(double.infinity, 60)),
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
+              child: TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil(loginRoute, (route) => false);
+                },
+                icon: const Icon(
+                  Icons.email,
+                  color: AppColors.pink,
+                ),
+                label: const Text('Đăng nhập bằng Email',
+                    style: TextStyle(
+                      color: AppColors.pink, // Màu chữ
+                      fontSize: 18, // Kích thước font
+                    )),
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(AppColors.pinkSecond),
+                  minimumSize: MaterialStateProperty.all<Size>(
+                      const Size(double.infinity, 60)),
+                ),
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: Container(
+          padding: const EdgeInsets.all(15.0),
+          child: const Text(
+            'Developed by Todoos - 2023',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12.0, color: Colors.black),
           ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration:
-                const InputDecoration(hintText: 'Enter your password here'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                final UserCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: email, password: password);
-                print(UserCredential);
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'unknown') {
-                  print('Không tìm thấy người dùng');
-                } else if (e.code == 'wrong-password') {
-                  print('Sai mật khẩu');
-                }
-              }
-            },
-            child: const Text('Login'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil(registerRoute, (route) => false);
-            },
-            child: const Text('Not register yet? Register here.'),
-          )
-        ],
-      ),
-    );
+        ));
   }
 }

@@ -9,7 +9,7 @@ void showToast(String message, {ToastGravity gravity = ToastGravity.TOP}) {
       gravity: gravity,
       timeInSecForIosWeb: 2,
       webBgColor: "#ffffff",
-      textColor: Colors.white,
+      textColor: Colors.black,
       fontSize: 16.0);
 }
 

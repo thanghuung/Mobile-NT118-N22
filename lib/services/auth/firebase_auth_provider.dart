@@ -6,8 +6,10 @@ import 'package:app/services/auth/auth_exceptions.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   @override
   Future<AuthUser> createUser({
     required String email,
@@ -97,11 +99,32 @@ class FirebaseAuthProvider implements AuthProvider {
       throw UserNotLoggedInAuthException();
     }
   }
-  
+
   @override
-  Future<void> initialize() async{
+  Future<void> initialize() async {
     await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   }
+
+  // Future<UserCredential?> signInWithGoogle() async {
+  //   // Xác thực bằng Google
+  //   final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+  //   if (googleUser == null) return null;
+
+  //   // Step 2: Lấy thông tin đăng nhập của Google
+  //   final GoogleSignInAuthentication googleAuth =
+  //       await googleUser.authentication;
+
+  //   // Step 3: Tạo Credential từ thông tin đăng nhập Google
+  //   final OAuthCredential credential = GoogleAuthProvider.credential(
+  //     accessToken: googleAuth.accessToken,
+  //     idToken: googleAuth.idToken,
+  //   );
+
+  //   // Step 4: Đăng nhập vào Firebase với Credential
+  //   final UserCredential userCredential =
+  //       await _auth.signInWithCredential(credential);
+  //   return userCredential;
+  // }
 }
