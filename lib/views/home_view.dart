@@ -28,23 +28,27 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-        future: AuthService.firebase().initialize(),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              final user = AuthService.firebase().currentUser;
-              print(user);
-              if (user != null) {
-                return _screens[_selectedIndex];
-              } else {
-                return const Welcome();
-              }
-            default:
-              return const CircularProgressIndicator();
-          }
-        },
-      ),
+      // body: FutureBuilder(
+      //   future: AuthService.firebase().initialize(),
+      //   builder: (context, snapshot) {
+      //     switch (snapshot.connectionState) {
+      //       case ConnectionState.done:
+      //         final user = AuthService.firebase().currentUser;
+      //         print(user);
+      //         if (user != null) {
+      //           if (user.isEmailVerified) {
+      //             return _screens[_selectedIndex];
+      //           } else {
+      //             return const VerifyEmailView();
+      //           }
+      //         } else {
+      //           return const Welcome();
+      //         }
+      //       default:
+      //         return const CircularProgressIndicator();
+      //     }
+      //   },
+      // ),
       bottomNavigationBar: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           decoration: BoxDecoration(
