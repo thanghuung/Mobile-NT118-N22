@@ -3,20 +3,28 @@ import 'package:app/services/auth/auth_user.dart';
 import 'package:app/services/auth/auth_provider.dart';
 import 'package:app/services/auth/auth_exceptions.dart';
 
-import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth, FirebaseAuthException;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/contacts.readonly',
+    ],
+  );
+
+  final storage = new FlutterSecureStorage();
   @override
   Future<AuthUser> createUser({
     required String email,
     required String password,
   }) async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -43,7 +51,7 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   AuthUser? get currentUser {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _auth.currentUser;
     if (user != null) {
       return AuthUser.fromFirebase(user);
     } else {
@@ -57,10 +65,11 @@ class FirebaseAuthProvider implements AuthProvider {
     required String password,
   }) async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      storeTokenAndData(userCredential);
       final user = currentUser;
       if (user != null) {
         return user;
@@ -82,9 +91,9 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   Future<void> logOut() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _auth.currentUser;
     if (user != null) {
-      await FirebaseAuth.instance.signOut();
+      await _auth.signOut();
     } else {
       throw UserNotLoggedInAuthException();
     }
@@ -92,9 +101,9 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   Future<void> sendEmailVerification() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _auth.currentUser;
     if (user != null) {
-      await FirebaseAuth.instance.signOut();
+      await _auth.signOut();
     } else {
       throw UserNotLoggedInAuthException();
     }
@@ -106,6 +115,18 @@ class FirebaseAuthProvider implements AuthProvider {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
+
+  void storeTokenAndData(UserCredential userCredential) async {
+    print("storing token and data");
+    await storage.write(
+        key: "token", value: userCredential.credential!.token.toString());
+    await storage.write(
+        key: "usercredential", value: userCredential.toString());
+  }
+
+  // Future<String> getToken() async {
+  //   return await storage.read(key: "token");
+  // }
 
   // Future<UserCredential?> signInWithGoogle() async {
   //   // Xác thực bằng Google

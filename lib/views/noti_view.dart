@@ -1,18 +1,18 @@
 import 'package:app/component/BottomNavBar.dart';
 import 'package:flutter/material.dart';
 
-class NoteView extends StatefulWidget {
-  const NoteView({super.key});
+class NotiView extends StatefulWidget {
+  const NotiView({super.key});
 
   @override
-  State<NoteView> createState() => _NoteViewState();
+  State<NotiView> createState() => _NotiViewState();
 }
 
-class _NoteViewState extends State<NoteView> {
+class _NotiViewState extends State<NotiView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text("home"),
+      body: Text("noti"),
     );
   }
 }

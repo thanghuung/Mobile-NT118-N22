@@ -1,10 +1,12 @@
+import 'package:app/AppColors.dart';
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 class BottomNavBar extends StatefulWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
+  final int currentIndex = 0;
+  // final ValueChanged<int> onTap;
 
-  BottomNavBar({required this.currentIndex, required this.onTap});
+  BottomNavBar(currentIndex);
 
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
@@ -13,35 +15,47 @@ class BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: widget.currentIndex,
-      onTap: widget.onTap,
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      selectedItemColor: Colors.pink,
-      unselectedItemColor: Colors.grey,
-      items: [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Colors.grey.shade300,
+              width: 1.0,
+            ),
+          ),
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          label: 'Search',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.add_circle_outline),
-          label: 'Add',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.notifications),
-          label: 'Notifications',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.more_horiz),
-          label: 'More',
-        ),
-      ],
-    );
+        child: GNav(
+          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+          activeColor: AppColors.pink,
+          duration: Duration(milliseconds: 0),
+          hoverColor: Colors.transparent,
+          gap: 8,
+          color: Colors.grey.shade600,
+          onTabChange: (index) {
+            setState(() {
+              // currentIndex = index;
+            });
+          },
+          tabs: const [
+            GButton(
+              icon: Icons.home,
+            ),
+            GButton(
+              icon: Icons.search,
+            ),
+            GButton(
+              icon: Icons.add,
+              iconActiveColor: Colors.white,
+              backgroundColor: AppColors.pink,
+            ),
+            GButton(
+              icon: Icons.notifications,
+            ),
+            GButton(
+              icon: Icons.settings,
+            ),
+          ],
+        ));
   }
 }
