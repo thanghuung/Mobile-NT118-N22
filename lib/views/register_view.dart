@@ -1,4 +1,5 @@
 import 'package:app/common.dart';
+import 'package:app/component/FormGroup.dart';
 import 'package:app/component/show_error_Dialog.dart';
 import 'package:app/constants/routes.dart';
 import 'package:app/services/auth/auth_exceptions.dart';
@@ -18,8 +19,6 @@ class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   late final TextEditingController _confirmPassword;
-  bool _obscureTextPS = true;
-  bool _obscureTextConfirm = true;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -56,6 +55,7 @@ class _RegisterViewState extends State<RegisterView> {
                             text: 'Todo',
                             style: TextStyle(
                                 fontSize: 48,
+                                fontFamily: 'Inter',
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.pink),
                           ),
@@ -77,155 +77,52 @@ class _RegisterViewState extends State<RegisterView> {
                           'Đăng ký tài khoản',
                           style: TextStyle(
                             fontSize: 24,
+                            fontFamily: 'Inter',
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
                       )),
-                  Container(
+                  FormGroup(
                     padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Email',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8, bottom: 8),
-                          child: TextFormField(
-                            controller: _email,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Email không được để trống!';
-                              } else if (!isValidEmail(value)) {
-                                return 'Email không đúng định dạng!';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Nhập email',
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    controller: _email,
+                    hintText: "Nhập email",
+                    label: "Email",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email không được để trống!';
+                      } else if (!isValidEmail(value)) {
+                        return 'Email không đúng định dạng!';
+                      }
+                      return null;
+                    },
+                    isPassword: false,
                   ),
-                  Container(
+                  FormGroup(
                     padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Mật khẩu',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8, bottom: 8),
-                          child: TextFormField(
-                            controller: _password,
-                            obscureText: _obscureTextPS,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Mật khẩu không được để trống';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Nhập mật khẩu',
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5),
-                                borderSide: BorderSide.none,
-                              ),
-                              suffixIcon: IconButton(
-                                hoverColor: Colors.transparent,
-                                splashColor: Colors.transparent,
-                                icon: Icon(_obscureTextPS
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureTextPS = !_obscureTextPS;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    controller: _password,
+                    hintText: "Nhập mật khẩu",
+                    label: "Mật khâu",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Mật khẩu không được để trống!';
+                      }
+                      return null;
+                    },
+                    isPassword: true,
                   ),
-                  Container(
+                  FormGroup(
                     padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Xác nhận mật khẩu',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8, bottom: 8),
-                          child: TextFormField(
-                            controller: _confirmPassword,
-                            obscureText: _obscureTextConfirm,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Mật khẩu không được để trống';
-                              } else if (value.compareTo(_password.text) != 0) {
-                                return 'Mật khẩu nhập lại không đúng';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Nhập mật khẩu',
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5),
-                                borderSide: BorderSide.none,
-                              ),
-                              suffixIcon: IconButton(
-                                hoverColor: Colors.transparent,
-                                splashColor: Colors.transparent,
-                                icon: Icon(_obscureTextConfirm
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureTextConfirm = !_obscureTextConfirm;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    controller: _confirmPassword,
+                    hintText: "Xác nhận mật khẩu",
+                    label: "Xác nhận mật khâu",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Mật khẩu không được để trống!';
+                      }
+                      return null;
+                    },
+                    isPassword: true,
                   ),
                   Container(
                     padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
@@ -292,8 +189,9 @@ class _RegisterViewState extends State<RegisterView> {
                             password: password,
                           );
                           final user = FirebaseAuth.instance.currentUser;
-                          addUserToFirestore(email, password);
-                          await user?.sendEmailVerification();
+                          addUserToFirestore(email, password, user!.uid);
+                          addCatetoryToFirestore("Cá nhân", user.uid, null);
+                          await user.sendEmailVerification();
                           Navigator.of(context).pushNamed(loginRoute);
                         } on FirebaseAuthException catch (e) {
                           if (e.code == 'weak-password') {
@@ -332,15 +230,17 @@ class _RegisterViewState extends State<RegisterView> {
                         text: const TextSpan(
                           text: 'Đã có tài khoản? ',
                           style: TextStyle(
-                            color: Colors.black,
                             fontSize: 16,
+                            color: Colors.black,
+                            fontFamily: 'Inter',
                           ),
                           children: <TextSpan>[
                             TextSpan(
                               text: 'Đăng nhập',
                               style: TextStyle(
-                                color: AppColors.pinkTertiary,
                                 fontSize: 16,
+                                fontFamily: 'Inter',
+                                color: AppColors.pinkTertiary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -356,7 +256,11 @@ class _RegisterViewState extends State<RegisterView> {
         child: const Text(
           'Developed by Todoos - 2023',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12.0, color: Colors.black),
+          style: TextStyle(
+            fontSize: 12.0,
+            color: Colors.black,
+            fontFamily: 'Inter',
+          ),
         ),
       ),
     );

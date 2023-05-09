@@ -1,5 +1,5 @@
 import 'package:app/AppColors.dart';
-import 'package:app/component/BottomNavBar.dart';
+import 'package:app/component/AddTaskBottomSheet.dart';
 import 'package:app/services/auth/auth_service.dart';
 import 'package:app/views/notes_view.dart';
 import 'package:app/views/noti_view.dart';
@@ -17,38 +17,60 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  bool isSidebarOpen = false;
 
   final List<Widget> _screens = [
-    // Add your screen widgets here
     const NoteView(),
     const SearchView(),
+    const SizedBox(),
+    const NotiView(),
     const NotiView(),
   ];
+
+  void _showAddTaskBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return const AddTaskBottomSheet();
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // body: FutureBuilder(
-      //   future: AuthService.firebase().initialize(),
-      //   builder: (context, snapshot) {
-      //     switch (snapshot.connectionState) {
-      //       case ConnectionState.done:
-      //         final user = AuthService.firebase().currentUser;
-      //         print(user);
-      //         if (user != null) {
-      //           if (user.isEmailVerified) {
-      //             return _screens[_selectedIndex];
-      //           } else {
-      //             return const VerifyEmailView();
-      //           }
-      //         } else {
-      //           return const Welcome();
-      //         }
-      //       default:
-      //         return const CircularProgressIndicator();
-      //     }
-      //   },
-      // ),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _screens,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text('Oflutter.com'),
+              accountEmail: Text('example@gmail.com'),
+              currentAccountPicture: CircleAvatar(
+                child: ClipOval(
+                  child: Image.network(
+                    'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
+                    fit: BoxFit.cover,
+                    width: 90,
+                    height: 90,
+                  ),
+                ),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: NetworkImage(
+                        'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')),
+              ),
+            ),
+          ],
+        ),
+      ),
+      endDrawer: Container(),
       bottomNavigationBar: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           decoration: BoxDecoration(
@@ -67,9 +89,19 @@ class _HomePageState extends State<HomePage> {
             gap: 8,
             color: Colors.grey.shade600,
             onTabChange: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
+              if (index == 2) {
+                // Index của tab "add"
+                _showAddTaskBottomSheet(context);
+              } else if (index == 4) {
+                setState(() {
+                  isSidebarOpen = true;
+                });
+              } else {
+                setState(() {
+                  isSidebarOpen = false;
+                  _selectedIndex = index;
+                });
+              }
             },
             tabs: const [
               GButton(
@@ -87,10 +119,40 @@ class _HomePageState extends State<HomePage> {
                 icon: Icons.notifications,
               ),
               GButton(
-                icon: Icons.settings,
+                icon: Icons.menu,
               ),
             ],
           )),
+    );
+  }
+
+  Drawer _buildSidebar() {
+    return Drawer(
+      child: ListView(
+        children: [
+          UserAccountsDrawerHeader(
+            accountName: Text('Oflutter.com'),
+            accountEmail: Text('example@gmail.com'),
+            currentAccountPicture: CircleAvatar(
+              child: ClipOval(
+                child: Image.network(
+                  'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
+                  fit: BoxFit.cover,
+                  width: 90,
+                  height: 90,
+                ),
+              ),
+            ),
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: NetworkImage(
+                      'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

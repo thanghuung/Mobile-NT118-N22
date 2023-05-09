@@ -1,4 +1,3 @@
-import 'package:app/component/BottomNavBar.dart';
 import 'package:flutter/material.dart';
 
 class SearchView extends StatefulWidget {

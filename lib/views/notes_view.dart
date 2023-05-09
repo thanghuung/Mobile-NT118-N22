@@ -1,5 +1,9 @@
-import 'package:app/component/BottomNavBar.dart';
+import 'package:app/AppColors.dart';
+import 'package:app/common.dart';
+import 'package:app/component/NoteComponent.dart';
+import 'package:app/state/GlobalData.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class NoteView extends StatefulWidget {
   const NoteView({super.key});
@@ -9,10 +13,52 @@ class NoteView extends StatefulWidget {
 }
 
 class _NoteViewState extends State<NoteView> {
+  final GlobalData dataController = Get.put(GlobalData());
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // loadUpcomingTasks();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Text("home"),
+      body: GetX<GlobalData>(
+        init: dataController,
+        initState: (_) {
+          // Gọi hàm fetchTasksByUserId với user ID cần lấy tasks
+          dataController.getUpcomingTasks();
+        },
+        builder: (controller) {
+          if (controller.upcomingTasks.isEmpty) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return ListView.builder(
+              itemCount: controller.upcomingTasks.length,
+              itemBuilder: (context, index) {
+                final task = controller.upcomingTasks[index];
+                return NoteComponent(
+                  id: task["id"],
+                  content: task["content"],
+                  description: task["description"],
+                  isCompleted: task["isCompleted"],
+                  category: task["categoryID"],
+                  date: task["dateDone"],
+                  backgroundColor: backgroundToColor(task["color"]),
+                  priority: priorityToColor(task["priority"]),
+                  onCheckboxChanged: (value) => setState(() {
+                    task["isCompleted"] = !task["isCompleted"];
+                  }),
+                );
+              },
+            );
+          }
+        },
+      ),
     );
   }
 }

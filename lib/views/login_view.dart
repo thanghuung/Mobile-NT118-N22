@@ -1,4 +1,5 @@
 import 'package:app/common.dart';
+import 'package:app/component/FormGroup.dart';
 import 'package:app/component/show_error_Dialog.dart';
 import 'package:app/constants/routes.dart';
 import 'package:app/services/auth/auth_exceptions.dart';
@@ -16,7 +17,6 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
-  bool _obscureText = true;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -51,6 +51,7 @@ class _LoginViewState extends State<LoginView> {
                             text: 'Todo',
                             style: TextStyle(
                                 fontSize: 48,
+                                fontFamily: 'Inter',
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.pink),
                           ),
@@ -58,6 +59,7 @@ class _LoginViewState extends State<LoginView> {
                             text: 'os',
                             style: TextStyle(
                                 fontSize: 48,
+                                fontFamily: 'Inter',
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.purple),
                           ),
@@ -77,97 +79,33 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         ),
                       )),
-                  Container(
+                  FormGroup(
                     padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Email',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8, bottom: 8),
-                          child: TextFormField(
-                            controller: _email,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Email không được để trống!';
-                              } else if (!isValidEmail(value)) {
-                                return 'Email không đúng định dạng!';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Nhập email',
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    controller: _email,
+                    hintText: "Nhập email",
+                    label: "Email",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email không được để trống!';
+                      } else if (!isValidEmail(value)) {
+                        return 'Email không đúng định dạng!';
+                      }
+                      return null;
+                    },
+                    isPassword: false,
                   ),
-                  Container(
+                  FormGroup(
                     padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Mật khẩu',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8, bottom: 8),
-                          child: TextFormField(
-                            controller: _password,
-                            obscureText: _obscureText,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Mật khẩu không được để trống';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Nhập mật khẩu',
-                              filled: true,
-                              fillColor: Colors.grey[200],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5),
-                                borderSide: BorderSide.none,
-                              ),
-                              suffixIcon: IconButton(
-                                hoverColor: Colors.transparent,
-                                splashColor: Colors.transparent,
-                                icon: Icon(_obscureText
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureText = !_obscureText;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    controller: _password,
+                    hintText: "Nhập mật khẩu",
+                    label: "Mật khâu",
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Mật khẩu không được để trống!';
+                      }
+                      return null;
+                    },
+                    isPassword: true,
                   ),
                   Container(
                     padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
@@ -188,7 +126,7 @@ class _LoginViewState extends State<LoginView> {
 
                           final user = AuthService.firebase().currentUser;
                           Navigator.of(context).pushNamedAndRemoveUntil(
-                            notesRoute,
+                            homeRoute,
                             (route) => false,
                           );
                           // if (user?.isEmailVerified ?? false) {
@@ -247,8 +185,9 @@ class _LoginViewState extends State<LoginView> {
                         text: const TextSpan(
                           text: 'Chưa có tài khoản? ',
                           style: TextStyle(
-                            color: Colors.black,
                             fontSize: 16,
+                            color: Colors.black,
+                            fontFamily: 'Inter',
                           ),
                           children: <TextSpan>[
                             TextSpan(
@@ -257,6 +196,7 @@ class _LoginViewState extends State<LoginView> {
                                 color: AppColors.pinkTertiary,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'Inter',
                               ),
                             ),
                           ],
@@ -271,7 +211,11 @@ class _LoginViewState extends State<LoginView> {
         child: const Text(
           'Developed by Todoos - 2023',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12.0, color: Colors.black),
+          style: TextStyle(
+            fontSize: 12.0,
+            color: Colors.black,
+            fontFamily: 'Inter',
+          ),
         ),
       ),
     );

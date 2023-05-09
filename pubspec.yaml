@@ -42,6 +42,8 @@ dependencies:
   firebase_core: ^2.11.0
   firebase_auth: ^4.5.0
   cloud_firestore: ^4.6.0
+  intl: ^0.17.0
+  get: ^4.6.5
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -64,6 +66,19 @@ flutter:
   assets:
     - assets/images/
   uses-material-design: true
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: fonts/Inter-Regular.ttf
+        - asset: fonts/Inter-Medium.ttf
+        - asset: fonts/Inter-Light.ttf
+        - asset: fonts/Inter-Semibold.ttf
+        - asset: fonts/Inter-Black.ttf
+        - asset: fonts/Inter-Bold.ttf
+        - asset: fonts/Inter-Thin.ttf
+          weight: 700
+        - asset: fonts/Inter-ExtraBold.ttf
+          weight: 800
 
   # To add assets to your application, add an assets section, like this:
   # assets:
