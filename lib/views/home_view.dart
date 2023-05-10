@@ -1,11 +1,9 @@
 import 'package:app/AppColors.dart';
 import 'package:app/component/AddTaskBottomSheet.dart';
-import 'package:app/services/auth/auth_service.dart';
 import 'package:app/views/notes_view.dart';
 import 'package:app/views/noti_view.dart';
 import 'package:app/views/search_view.dart';
-import 'package:app/views/verify_email_view.dart';
-import 'package:app/views/welcome.dart';
+import 'package:app/views/setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
@@ -17,14 +15,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  bool isSidebarOpen = false;
+  // bool isSidebarOpen = false;
 
   final List<Widget> _screens = [
     const NoteView(),
     const SearchView(),
     const SizedBox(),
     const NotiView(),
-    const NotiView(),
+    const SettingView(),
   ];
 
   void _showAddTaskBottomSheet(BuildContext context) {
@@ -43,34 +41,6 @@ class _HomePageState extends State<HomePage> {
         index: _selectedIndex,
         children: _screens,
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text('Oflutter.com'),
-              accountEmail: Text('example@gmail.com'),
-              currentAccountPicture: CircleAvatar(
-                child: ClipOval(
-                  child: Image.network(
-                    'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
-                    fit: BoxFit.cover,
-                    width: 90,
-                    height: 90,
-                  ),
-                ),
-              ),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: NetworkImage(
-                        'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')),
-              ),
-            ),
-          ],
-        ),
-      ),
-      endDrawer: Container(),
       bottomNavigationBar: Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           decoration: BoxDecoration(
@@ -92,13 +62,9 @@ class _HomePageState extends State<HomePage> {
               if (index == 2) {
                 // Index của tab "add"
                 _showAddTaskBottomSheet(context);
-              } else if (index == 4) {
-                setState(() {
-                  isSidebarOpen = true;
-                });
               } else {
                 setState(() {
-                  isSidebarOpen = false;
+                  // isSidebarOpen = false;
                   _selectedIndex = index;
                 });
               }

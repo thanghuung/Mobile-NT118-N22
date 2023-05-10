@@ -1,8 +1,10 @@
+import 'package:app/model/Group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GlobalData extends GetxController {
+  // task
   List<Map<String, dynamic>> upcomingTasks = <Map<String, dynamic>>[].obs;
 
   Future<List<Map<String, dynamic>>> getUpcomingTasks() async {
@@ -76,6 +78,61 @@ class GlobalData extends GetxController {
           'dateDone': dateDone as Timestamp,
         });
       } catch (error) {}
+    }
+  }
+
+// group
+  final CollectionReference groupsCollection =
+      FirebaseFirestore.instance.collection('groups');
+
+  final RxList<Group> groups = RxList<Group>();
+
+  Future<void> createGroup(String groupName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('userId') ?? '';
+    try {
+      final docRef = await groupsCollection.add({
+        'groupName': groupName,
+        'hostID': userId,
+        'dateCreated': DateTime.now()
+      });
+      final newGroup = Group(id: docRef.id, name: groupName);
+      groups.add(newGroup);
+    } catch (error) {
+      print('Error creating group: $error');
+    }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    getGroups();
+    getUpcomingTasks();
+  }
+
+  Future<List<Group>> getGroups() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('userId') ?? '';
+    try {
+      final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('groups')
+          .where('hostID', isEqualTo: userId)
+          .get();
+
+      final List<Group> groups = querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Group(
+          id: doc.id,
+          name: data['groupName'],
+          // Các thuộc tính khác của nhóm
+        );
+      }).toList();
+
+      return groups;
+    } catch (error) {
+      // Xử lý lỗi
+      print('Error getting groups: $error');
+      return [];
     }
   }
 }
