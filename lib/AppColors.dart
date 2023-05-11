@@ -14,3 +14,11 @@ class AppColors {
   static const Color blue = Color.fromRGBO(37, 37, 235, 1);
   static const Color blueSecond = Color.fromRGBO(225, 238, 254, 1);
 }
+
+class AppFontText {
+  static const title = TextStyle(
+    color: Colors.black,
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+  );
+}

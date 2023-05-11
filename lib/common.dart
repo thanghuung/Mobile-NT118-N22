@@ -15,7 +15,7 @@ void showToast(String message, {ToastGravity gravity = ToastGravity.TOP}) {
       gravity: gravity,
       timeInSecForIosWeb: 2,
       webBgColor: "#ffffff",
-      textColor: Colors.black,
+      textColor: Colors.white,
       fontSize: 16.0);
 }
 
@@ -86,7 +86,7 @@ Future<List<Map<String, dynamic>>> getAllCategories() async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('categories')
-          .where('userID', isEqualTo: userId)
+          // .where('userID', isEqualTo: userId)
           .get();
 
       querySnapshot.docs.forEach((doc) {

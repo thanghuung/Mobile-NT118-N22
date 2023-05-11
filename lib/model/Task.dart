@@ -21,21 +21,4 @@ class Task {
     required this.priority,
     required this.date,
   });
-//   Task(String id,
-//      String content,
-//      String description,
-//      bool isCompleted,
-//      String category,
-//      Color backgroundColor,
-//      Color priority,
-//      Timestamp date){
-// this.id = id ;
-//      this.content = content;
-//      this.description = description;
-//      this.isCompleted = isCompleted;
-//      this.category = category;
-//      this.backgroundColor = backgroundColor;
-//      this.priority = priority;
-//      this.date = date;
-// };
 }

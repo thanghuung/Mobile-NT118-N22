@@ -1,32 +1,45 @@
+import 'package:app/model/Group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GlobalData extends GetxController {
+  // task
   List<Map<String, dynamic>> upcomingTasks = <Map<String, dynamic>>[].obs;
+  List<Map<String, dynamic>> todayTasks = <Map<String, dynamic>>[].obs;
 
   Future<List<Map<String, dynamic>>> getUpcomingTasks() async {
+    upcomingTasks = <Map<String, dynamic>>[{"loading": true}].obs;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('userId') ?? '';
+    String userId = FirebaseAuth.instance.currentUser?.uid ?? "";
     try {
       final DateTime currentDate = DateTime.now();
-
       final collectionRef = FirebaseFirestore.instance.collection('tasks');
-      final querySnapshot = await collectionRef
+      var querySnapshot = await collectionRef
           .where('userID', isEqualTo: userId)
           .where('dateDone', isGreaterThanOrEqualTo: currentDate)
           .get();
 
+
+
+      print("list: ${querySnapshot.docs.length}");
+
       // Xóa danh sách cũ trước khi thêm dữ liệu mới
       upcomingTasks.clear();
 
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         Map<String, dynamic> taskData = doc.data();
         taskData['id'] = doc.id; // Lấy ID của category
         upcomingTasks.add(taskData);
-      });
+      }
 
-      return upcomingTasks;
+      querySnapshot = await collectionRef
+          .where('userID', isEqualTo: userId)
+          .where('dateDone', isEqualTo: currentDate)
+          .get();
+
+      return upcomingTasks??[];
     } catch (error) {
       return [];
     }
@@ -76,6 +89,61 @@ class GlobalData extends GetxController {
           'dateDone': dateDone as Timestamp,
         });
       } catch (error) {}
+    }
+  }
+
+// group
+  final CollectionReference groupsCollection =
+      FirebaseFirestore.instance.collection('groups');
+
+  final RxList<Group> groups = RxList<Group>();
+
+  Future<void> createGroup(String groupName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('userId') ?? '';
+    try {
+      final docRef = await groupsCollection.add({
+        'groupName': groupName,
+        'hostID': userId,
+        'dateCreated': DateTime.now()
+      });
+      final newGroup = Group(id: docRef.id, name: groupName);
+      groups.add(newGroup);
+    } catch (error) {
+      print('Error creating group: $error');
+    }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    getGroups();
+    getUpcomingTasks();
+  }
+
+  Future<List<Group>> getGroups() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('userId') ?? '';
+    try {
+      final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('groups')
+          .where('hostID', isEqualTo: userId)
+          .get();
+
+      final List<Group> groups = querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Group(
+          id: doc.id,
+          name: data['groupName'],
+          // Các thuộc tính khác của nhóm
+        );
+      }).toList();
+
+      return groups;
+    } catch (error) {
+      // Xử lý lỗi
+      print('Error getting groups: $error');
+      return [];
     }
   }
 }

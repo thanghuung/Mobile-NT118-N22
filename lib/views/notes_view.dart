@@ -2,6 +2,7 @@ import 'package:app/AppColors.dart';
 import 'package:app/common.dart';
 import 'package:app/component/NoteComponent.dart';
 import 'package:app/state/GlobalData.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,39 +26,90 @@ class _NoteViewState extends State<NoteView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GetX<GlobalData>(
-        init: dataController,
-        initState: (_) {
-          // Gọi hàm fetchTasksByUserId với user ID cần lấy tasks
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("Hôm nay", style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 3,
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
           dataController.getUpcomingTasks();
         },
-        builder: (controller) {
-          if (controller.upcomingTasks.isEmpty) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            return ListView.builder(
-              itemCount: controller.upcomingTasks.length,
-              itemBuilder: (context, index) {
-                final task = controller.upcomingTasks[index];
-                return NoteComponent(
-                  id: task["id"],
-                  content: task["content"],
-                  description: task["description"],
-                  isCompleted: task["isCompleted"],
-                  category: task["categoryID"],
-                  date: task["dateDone"],
-                  backgroundColor: backgroundToColor(task["color"]),
-                  priority: priorityToColor(task["priority"]),
-                  onCheckboxChanged: (value) => setState(() {
-                    task["isCompleted"] = !task["isCompleted"];
-                  }),
-                );
-              },
-            );
-          }
-        },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  const Text(
+                    "Trễ hạn",
+                    style: AppFontText.title,
+                  ),
+                  TextButton(
+                    child:
+                        Text("Đặt lại", style: AppFontText.title.copyWith(color: AppColors.pink)),
+                    onPressed: () {},
+                  ),
+                ]),
+                GetX<GlobalData>(
+                  init: dataController,
+                  initState: (_) {
+                    // Gọi hàm fetchTasksByUserId với user ID cần lấy tasks
+                    dataController.getUpcomingTasks();
+                  },
+                  builder: (controller) {
+                    if (controller.upcomingTasks.length == 1 &&
+                        controller.upcomingTasks[0]['loading'] == true) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (controller.upcomingTasks.isEmpty ?? false) {
+                      return const Center(
+                        child: Text("Danh sách trống!"),
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          ...List.generate(
+                            controller.upcomingTasks.length,
+                            (index) {
+                              final task = controller.upcomingTasks[index] ?? {};
+                              return NoteComponent(
+                                id: task["id"],
+                                content: task["content"],
+                                description: task["description"],
+                                isCompleted: task["isCompleted"],
+                                category: task["categoryID"],
+                                date: task["dateDone"],
+                                backgroundColor: backgroundToColor(task["color"]),
+                                priority: priorityToColor(task["priority"]),
+                                onCheckboxChanged: (value) => setState(() {
+                                  task["isCompleted"] = !task["isCompleted"];
+                                }),
+                              );
+                            },
+                          )
+                        ],
+                      );
+                    }
+                  },
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Hôm nay - ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+                      style: AppFontText.title,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -87,7 +139,6 @@ Future<bool> showLogOutDialog(BuildContext context) {
         );
       }).then((value) => value ?? false);
 }
-
 
 // actions: [
 //           PopupMenuButton<MenuAction>(

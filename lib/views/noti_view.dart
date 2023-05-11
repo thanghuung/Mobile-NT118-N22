@@ -1,3 +1,4 @@
+import 'package:app/model/Notification.dart';
 import 'package:flutter/material.dart';
 
 class NotiView extends StatefulWidget {
@@ -8,10 +9,29 @@ class NotiView extends StatefulWidget {
 }
 
 class _NotiViewState extends State<NotiView> {
+  final List<NotificationItem> notifications = [
+    NotificationItem(
+      title: 'Đến hạn làm nhiệm vụ',
+      message: 'Học mobile',
+    ),
+    // Thêm các thông báo khác vào đây
+  ];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Text("noti"),
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(16),
+        child: Column(children: [
+          Text("Thông báo",
+              style: TextStyle(
+                  color: Colors.grey.shade800,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600)),
+          const SizedBox(
+            height: 20,
+          ),
+        ]),
+      ),
     );
   }
 }
@@ -40,7 +60,6 @@ Future<bool> showLogOutDialog(BuildContext context) {
         );
       }).then((value) => value ?? false);
 }
-
 
 // actions: [
 //           PopupMenuButton<MenuAction>(

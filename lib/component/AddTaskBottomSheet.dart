@@ -49,6 +49,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
   void loadCategories() async {
     List<Map<String, dynamic>> loadedCategories = await getAllCategories();
+    print("category: $loadedCategories");
 
     setState(() {
       categories = loadedCategories;
@@ -57,231 +58,223 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.all(16),
-        child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                    child: Text(
-                  'Tạo mới công việc',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+    return Container(
+      decoration: const BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
+      padding: const EdgeInsets.all(16),
+      child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                  child: Text(
+                'Tạo mới công việc',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              )),
+              const SizedBox(height: 16),
+              FormGroup(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                controller: _content,
+                hintText: "Nhập nội dung",
+                label: "Nội dung",
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Nội dung không được để trống!';
+                  }
+                  return null;
+                },
+                isPassword: false,
+              ),
+              const SizedBox(height: 16),
+              FormGroup(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                controller: _description,
+                hintText: "Nhập mô tả",
+                label: "Mô tả",
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Môt không được để trống!';
+                  }
+                  return null;
+                },
+                isPassword: false,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () => _selectDate(context),
+                    icon: Icon(Icons.calendar_today), // Biểu tượng (icon)
+                    label: Text(
+                      selectedDate == null ? 'Chọn ngày' : formatDate(selectedDate!),
+                    ), // Chữ
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white, // Màu nền của button
+                      foregroundColor: Colors.grey.shade600,
+                      padding: EdgeInsets.all(12),
+                      side: BorderSide(color: Colors.grey.shade600, width: 1), // Padding cho button
+                    ),
                   ),
-                )),
-                const SizedBox(height: 16),
-                FormGroup(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  controller: _content,
-                  hintText: "Nhập nội dung",
-                  label: "Nội dung",
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Nội dung không được để trống!';
-                    }
-                    return null;
-                  },
-                  isPassword: false,
-                ),
-                const SizedBox(height: 16),
-                FormGroup(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  controller: _description,
-                  hintText: "Nhập mô tả",
-                  label: "Mô tả",
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Mô t không được để trống!';
-                    }
-                    return null;
-                  },
-                  isPassword: false,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () => _selectDate(context),
-                      icon: Icon(Icons.calendar_today), // Biểu tượng (icon)
-                      label: Text(
-                        selectedDate == null
-                            ? 'Chọn ngày'
-                            : formatDate(selectedDate!),
-                      ), // Chữ
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white, // Màu nền của button
-                        foregroundColor: Colors.grey.shade600,
-                        padding: EdgeInsets.all(12),
-                        side: BorderSide(
-                            color: Colors.grey.shade600,
-                            width: 1), // Padding cho button
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    DropdownButton<String>(
-                      value: selectedPriority,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedPriority = newValue!;
-                        });
-                      },
-                      items: <String>[
-                        'Rất quan trọng',
-                        'Quan trọng',
-                        'Bình thường',
-                        'Không ưu tiên',
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        Color flagColor;
-                        switch (value) {
-                          case 'Rất quan trọng':
-                            flagColor = AppColors.red;
-                            break;
-                          case 'Quan trọng':
-                            flagColor = AppColors.purple;
-                            break;
-                          case 'Bình thường':
-                            flagColor = AppColors.blue;
-                            break;
-                          case 'Không ưu tiên':
-                            flagColor = Colors.grey;
-                            break;
-                          default:
-                            flagColor = Colors.grey;
-                            break;
-                        }
+                  const SizedBox(width: 20),
+                  DropdownButton<String>(
+                    value: selectedPriority,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedPriority = newValue!;
+                      });
+                    },
+                    items: <String>[
+                      'Rất quan trọng',
+                      'Quan trọng',
+                      'Bình thường',
+                      'Không ưu tiên',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      Color flagColor;
+                      switch (value) {
+                        case 'Rất quan trọng':
+                          flagColor = AppColors.red;
+                          break;
+                        case 'Quan trọng':
+                          flagColor = AppColors.purple;
+                          break;
+                        case 'Bình thường':
+                          flagColor = AppColors.blue;
+                          break;
+                        case 'Không ưu tiên':
+                          flagColor = Colors.grey;
+                          break;
+                        default:
+                          flagColor = Colors.grey;
+                          break;
+                      }
 
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Icon(
-                                Icons.flag,
-                                color: flagColor,
-                              ),
-                              const SizedBox(width: 8.0),
-                              Text(value),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    Container(
-                      width: 50,
-                      height: 40, // Adjust the width as needed
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: _getColor(selectedColor),
-                        border: Border.all(
-                          color: Colors.grey.shade400,
-                          width: 1.0,
-                        ),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: DropdownButtonFormField<TaskColor>(
-                        value: selectedColor,
-                        onChanged: (color) {
-                          setState(() {
-                            selectedColor = color!;
-                          });
-                        },
-                        icon: const Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.white,
-                        ),
-                        iconSize: 24,
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.color_lens,
-                            color: Colors.black,
-                          ),
-                        ),
-                        items: TaskColor.values.map((TaskColor color) {
-                          return DropdownMenuItem<TaskColor>(
-                            value: color,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: Icon(
-                                Icons.circle,
-                                color: _getColor(color),
-                                size: 16,
-                              ),
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Icon(
+                              Icons.flag,
+                              color: flagColor,
                             ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ],
+                            const SizedBox(width: 8.0),
+                            Text(value),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              Container(
+                width: 50,
+                height: 40, // Adjust the width as needed
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: _getColor(selectedColor),
+                  border: Border.all(
+                    color: Colors.grey.shade400,
+                    width: 1.0,
+                  ),
                 ),
-                DropdownButton<Map<String, dynamic>>(
-                  hint: Text("Chọn thể loại"),
-                  value: selectedCategory, // Giá trị category được chọn
-                  onChanged: (Map<String, dynamic>? newValue) {
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: DropdownButtonFormField<TaskColor>(
+                  value: selectedColor,
+                  onChanged: (color) {
                     setState(() {
-                      selectedCategory = newValue;
+                      selectedColor = color!;
                     });
                   },
-                  items: categories
-                      .map<DropdownMenuItem<Map<String, dynamic>>>((category) {
-                    return DropdownMenuItem<Map<String, dynamic>>(
-                      value: category,
-                      child: Text(category['categoryName']),
+                  icon: const Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.white,
+                  ),
+                  iconSize: 24,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(
+                      Icons.color_lens,
+                      color: Colors.black,
+                    ),
+                  ),
+                  items: TaskColor.values.map((TaskColor color) {
+                    return DropdownMenuItem<TaskColor>(
+                      value: color,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Icon(
+                          Icons.circle,
+                          color: _getColor(color),
+                          size: 16,
+                        ),
+                      ),
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 30),
-                Container(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
-                      } else {
-                        return;
-                      }
-                      if (selectedDate == null) {
-                        showToast("Hãy chọn ngày kết thúc của công việc!");
-                        return;
-                      }
+              ),
+              DropdownButton<Map<String, dynamic>>(
+                hint: const Text("Chọn thể loại"),
+                value: selectedCategory, // Giá trị category được chọn
+                onChanged: (Map<String, dynamic>? newValue) {
+                  setState(() {
+                    selectedCategory = newValue;
+                  });
+                },
+                items: categories.map<DropdownMenuItem<Map<String, dynamic>>>((category) {
+                  return DropdownMenuItem<Map<String, dynamic>>(
+                    value: category,
+                    child: Text(category['categoryName']),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 30),
+              Container(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+                    } else {
+                      return;
+                    }
+                    if (selectedDate == null) {
+                      showToast("Hãy chọn ngày kết thúc của công việc!");
+                      return;
+                    }
 
-                      if (selectedCategory == null) {
-                        showToast("Hãy chọn thể loại của công việc!");
-                        return;
-                      }
-                      String color = selectedColor.toString().split('.').last;
-                      dataController.addTaskToFirebase(
-                          _content.text,
-                          _description.text,
-                          color,
-                          selectedPriority,
-                          selectedCategory,
-                          selectedDate);
-                      Navigator.of(context)
-                          .pop(); // Đóng bottom sheet sau khi tạo task
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                      backgroundColor: AppColors.purple, // Màu nền hồng
-                      foregroundColor: Colors.white, // Màu chữ trắng
-                    ),
-                    child: const Text(
-                      'Tạo công việc',
-                    ),
+                    if (selectedCategory == null) {
+                      showToast("Hãy chọn thể loại của công việc!");
+                      return;
+                    }
+                    String color = selectedColor.toString().split('.').last;
+                    dataController.addTaskToFirebase(_content.text, _description.text, color,
+                        selectedPriority, selectedCategory, selectedDate);
+                    Navigator.of(context).pop(); // Đóng bottom sheet sau khi tạo task
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                    backgroundColor: AppColors.purple, // Màu nền hồng
+                    foregroundColor: Colors.white, // Màu chữ trắng
                   ),
-                )
-              ],
-            )),
-      ),
+                  child: const Text(
+                    'Tạo công việc',
+                  ),
+                ),
+              )
+            ],
+          )),
     );
   }
 
