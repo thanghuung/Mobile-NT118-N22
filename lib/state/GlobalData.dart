@@ -1,6 +1,5 @@
 import 'package:app/model/Group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,50 +9,52 @@ class GlobalData extends GetxController {
   List<Map<String, dynamic>> todayTasks = <Map<String, dynamic>>[].obs;
 
   Future<List<Map<String, dynamic>>> getUpcomingTasks() async {
-    upcomingTasks = <Map<String, dynamic>>[{"loading": true}].obs;
+    upcomingTasks = <Map<String, dynamic>>[
+      {"loading": true}
+    ].obs;
+    todayTasks = <Map<String, dynamic>>[
+      {"loading": true}
+    ].obs;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = FirebaseAuth.instance.currentUser?.uid ?? "";
+    String userId = prefs.getString('userId') ?? "";
     try {
       final DateTime currentDate = DateTime.now();
       final collectionRef = FirebaseFirestore.instance.collection('tasks');
       var querySnapshot = await collectionRef
           .where('userID', isEqualTo: userId)
-          .where('dateDone', isGreaterThanOrEqualTo: currentDate)
+          // .where('dateDone', isLessThan: currentDate)
           .get();
-
-
-
-      print("list: ${querySnapshot.docs.length}");
 
       // Xóa danh sách cũ trước khi thêm dữ liệu mới
       upcomingTasks.clear();
+      todayTasks.clear();
 
       for (var doc in querySnapshot.docs) {
-        Map<String, dynamic> taskData = doc.data();
-        taskData['id'] = doc.id; // Lấy ID của category
-        upcomingTasks.add(taskData);
+        final date = DateTime.fromMicrosecondsSinceEpoch(
+            (doc.data()['dateDone'] as Timestamp).microsecondsSinceEpoch);
+        if (compareDate(date, DateTime.now()) == -1 && doc.data()['isCompleted'] == false) {
+          Map<String, dynamic> taskData = doc.data();
+          taskData['id'] = doc.id; // Lấy ID của category
+          upcomingTasks.add(taskData);
+        }
+        if (compareDate(date, DateTime.now()) == 0) {
+          Map<String, dynamic> taskData = doc.data();
+          taskData['id'] = doc.id; // Lấy ID của category
+          todayTasks.add(taskData);
+        }
       }
 
-      querySnapshot = await collectionRef
-          .where('userID', isEqualTo: userId)
-          .where('dateDone', isEqualTo: currentDate)
-          .get();
-
-      return upcomingTasks??[];
+      return upcomingTasks ?? [];
     } catch (error) {
       return [];
     }
   }
 
-  void addTaskToFirebase(
-      String content,
-      String description,
-      String color,
-      String priority,
-      Map<String, dynamic>? category,
-      DateTime? dateDone) async {
+  void addTaskToFirebase(String content, String description, String color, String priority,
+      Map<String, dynamic>? category, DateTime? dateDone) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('userId') ?? '';
+    print(userId);
     if (userId.isNotEmpty) {
       try {
         // Lấy tham chiếu đến collection "tasks"
@@ -93,8 +94,7 @@ class GlobalData extends GetxController {
   }
 
 // group
-  final CollectionReference groupsCollection =
-      FirebaseFirestore.instance.collection('groups');
+  final CollectionReference groupsCollection = FirebaseFirestore.instance.collection('groups');
 
   final RxList<Group> groups = RxList<Group>();
 
@@ -102,11 +102,8 @@ class GlobalData extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('userId') ?? '';
     try {
-      final docRef = await groupsCollection.add({
-        'groupName': groupName,
-        'hostID': userId,
-        'dateCreated': DateTime.now()
-      });
+      final docRef = await groupsCollection
+          .add({'groupName': groupName, 'hostID': userId, 'dateCreated': DateTime.now()});
       final newGroup = Group(id: docRef.id, name: groupName);
       groups.add(newGroup);
     } catch (error) {
@@ -144,6 +141,37 @@ class GlobalData extends GetxController {
       // Xử lý lỗi
       print('Error getting groups: $error');
       return [];
+    }
+  }
+}
+
+/// -1 => <
+/// 0 => =
+/// 1 => >
+int compareDate(DateTime a, DateTime b) {
+  if (a.year > b.year) {
+    return 1;
+  } else {
+    if (a.year < b.year) {
+      return -1;
+    } else {
+      if (a.month > b.month) {
+        return 1;
+      } else {
+        if (a.month < b.month) {
+          return -1;
+        } else {
+          if (a.day > b.day) {
+            return 1;
+          } else {
+            if (a.day < b.day) {
+              return -1;
+            } else {
+              return 0;
+            }
+          }
+        }
+      }
     }
   }
 }

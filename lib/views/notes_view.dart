@@ -17,10 +17,10 @@ class _NoteViewState extends State<NoteView> {
   final GlobalData dataController = Get.put(GlobalData());
   bool isLoading = true;
 
+
   @override
   void initState() {
     super.initState();
-    // loadUpcomingTasks();
   }
 
   @override
@@ -35,24 +35,15 @@ class _NoteViewState extends State<NoteView> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
+          setState(() {});
           dataController.getUpcomingTasks();
         },
         child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  const Text(
-                    "Trễ hạn",
-                    style: AppFontText.title,
-                  ),
-                  TextButton(
-                    child:
-                        Text("Đặt lại", style: AppFontText.title.copyWith(color: AppColors.pink)),
-                    onPressed: () {},
-                  ),
-                ]),
                 GetX<GlobalData>(
                   init: dataController,
                   initState: (_) {
@@ -60,17 +51,19 @@ class _NoteViewState extends State<NoteView> {
                     dataController.getUpcomingTasks();
                   },
                   builder: (controller) {
+                    final upcomingView;
+                    final todayView;
                     if (controller.upcomingTasks.length == 1 &&
                         controller.upcomingTasks[0]['loading'] == true) {
-                      return const Center(
+                      upcomingView = const Center(
                         child: CircularProgressIndicator(),
                       );
                     } else if (controller.upcomingTasks.isEmpty ?? false) {
-                      return const Center(
+                      upcomingView = const Center(
                         child: Text("Danh sách trống!"),
                       );
                     } else {
-                      return Column(
+                      upcomingView = Column(
                         children: [
                           ...List.generate(
                             controller.upcomingTasks.length,
@@ -94,18 +87,74 @@ class _NoteViewState extends State<NoteView> {
                         ],
                       );
                     }
+
+                    if (controller.todayTasks.length == 1 &&
+                        controller.todayTasks[0]['loading'] == true) {
+                      todayView = const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (controller.todayTasks.isEmpty ?? false) {
+                      todayView = const Center(
+                        child: Text("Danh sách trống!"),
+                      );
+                    } else {
+                      todayView = Column(
+                        children: [
+                          ...List.generate(
+                            controller.todayTasks.length,
+                            (index) {
+                              final task = controller.todayTasks[index] ?? {};
+                              return NoteComponent(
+                                id: task["id"],
+                                content: task["content"],
+                                description: task["description"],
+                                isCompleted: task["isCompleted"],
+                                category: task["categoryID"],
+                                date: task["dateDone"],
+                                backgroundColor: backgroundToColor(task["color"]),
+                                priority: priorityToColor(task["priority"]),
+                                onCheckboxChanged: (value) => setState(() {
+                                  task["isCompleted"] = !task["isCompleted"];
+                                }),
+                              );
+                            },
+                          )
+                        ],
+                      );
+                    }
+                    return Column(
+                      children: [
+                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                          const Text(
+                            "Trễ hạn",
+                            style: AppFontText.title,
+                          ),
+                          TextButton(
+                            child: Text("Đặt lại",
+                                style: AppFontText.title.copyWith(color: AppColors.pink)),
+                            onPressed: () {},
+                          ),
+                        ]),
+                        upcomingView,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Hôm nay - ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+                              style: AppFontText.title,
+                            ),
+                          ),
+                        ),
+                        todayView
+                      ],
+                    );
                   },
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Hôm nay - ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
-                      style: AppFontText.title,
-                    ),
-                  ),
-                ),
+                // const Expanded(child: SizedBox(
+                //   height: 400,
+                //   width: 100,
+                // ))
               ],
             ),
           ),

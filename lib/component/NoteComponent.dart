@@ -1,6 +1,7 @@
 import 'package:app/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class NoteComponent extends StatefulWidget {
   final String id;
@@ -55,24 +56,27 @@ class _NoteComponentState extends State<NoteComponent> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-          color: !widget.isCompleted
-              ? (widget.backgroundColor ?? Colors.white)
-              : Colors.grey.shade200,
+          color:
+              !widget.isCompleted ? (widget.backgroundColor ?? Colors.white) : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(12)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
-            onTap: () {
+            onTap: () async {
+              EasyLoading.show();
+              CollectionReference tasks = FirebaseFirestore.instance.collection('tasks');
+              await tasks.doc(widget.id).update({'isCompleted': !widget.isCompleted}).then(
+                  (value) => print("tasks Updated"));
               widget.onCheckboxChanged.call(!widget.isCompleted);
+              EasyLoading.dismiss();
             },
             child: Container(
               width: 20, // Chiều rộng của checkbox
               height: 20, // Chiều cao của checkbox
               decoration: BoxDecoration(
                 shape: BoxShape.circle, // Hình dạng hình tròn cho checkbox
-                border:
-                    Border.all(color: widget.priority, width: 2), // Viền màu hồng cho checkbox
+                border: Border.all(color: widget.priority, width: 2), // Viền màu hồng cho checkbox
                 color: widget.isCompleted
                     ? widget.priority
                     : Colors.white, // Màu hồng khi được check, màu trong suốt khi chưa được check

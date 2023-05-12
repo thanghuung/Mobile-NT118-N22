@@ -1,4 +1,11 @@
+import 'package:app/AppColors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../common.dart';
+import '../component/NoteComponent.dart';
 
 class SearchView extends StatefulWidget {
   const SearchView({super.key});
@@ -8,10 +15,113 @@ class SearchView extends StatefulWidget {
 }
 
 class _SearchViewState extends State<SearchView> {
+  List<Map<String, dynamic>>? listData = null;
+
+  TextEditingController _searchInput = TextEditingController();
+  Future<void> getData() async {
+    if(_searchInput.text.trim() != ""){
+      EasyLoading.show();
+      final collectionRef = FirebaseFirestore.instance.collection('tasks');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userId = prefs.getString('userId') ?? "";
+      var querySnapshot = await collectionRef
+          .where('userID', isEqualTo: userId)
+          .get();
+
+      // Xóa danh sách cũ trước khi thêm dữ liệu mới1
+      listData=[];
+      for (var doc in querySnapshot.docs) {
+        if((doc['content']as String).contains(_searchInput.text)){
+          Map<String, dynamic> taskData = doc.data();
+          taskData['id'] = doc.id; // Lấy ID của category
+          listData?.add(taskData);
+        }
+      }
+      setState(() {
+      });
+      EasyLoading.dismiss();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Text("search"),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          elevation: 0,
+          scrolledUnderElevation: 3,
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              SizedBox(
+                height: 40,
+                width: MediaQuery.of(context).size.width - 32,
+                child: TextFormField(
+                  controller: _searchInput,
+                  decoration: InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: TextButton(
+                        child: const Text(
+                          "Tìm",
+                          style: TextStyle(color: AppColors.pink),
+                        ),
+                        onPressed: () {
+                          getData();
+                        },
+                      ),
+                      prefixIconColor: AppColors.pink,
+                      border: const OutlineInputBorder(),
+                      focusedBorder:
+                          const OutlineInputBorder(borderSide: BorderSide(color: AppColors.pink))),
+                ),
+              )
+            ],
+          ),
+        ),
+        body: listData == null
+            ? const Center(
+                child: Text(
+                  "Vui nhập từ khóa để tìm kiếm",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            : (listData?.isEmpty ?? false
+                ? const Center(
+                    child: Text("Danh sách trống"),
+                  )
+                : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                        children: [
+                          ...(listData ?? [])
+                              .map((task) => NoteComponent(
+                                    id: task["id"],
+                                    content: task["content"],
+                                    description: task["description"],
+                                    isCompleted: task["isCompleted"],
+                                    category: task["categoryID"],
+                                    date: task["dateDone"],
+                                    backgroundColor: backgroundToColor(task["color"]),
+                                    priority: priorityToColor(task["priority"]),
+                                    onCheckboxChanged: (value) => setState(() {
+                                      task["isCompleted"] = !task["isCompleted"];
+                                    }),
+                                  ))
+                              .toList()
+                        ],
+                      ),
+                  ),
+                )),
+      ),
     );
   }
 }
@@ -40,7 +150,6 @@ Future<bool> showLogOutDialog(BuildContext context) {
         );
       }).then((value) => value ?? false);
 }
-
 
 // actions: [
 //           PopupMenuButton<MenuAction>(

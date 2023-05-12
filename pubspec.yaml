@@ -42,6 +42,7 @@ dependencies:
   firebase_core: ^2.11.0
   firebase_auth: ^4.5.0
   cloud_firestore: ^4.6.0
+  flutter_easyloading:
   intl: ^0.17.0
   get: ^4.6.5
 dev_dependencies:

@@ -1,6 +1,7 @@
 import 'package:app/AppColors.dart';
 import 'package:app/model/Group.dart';
 import 'package:app/state/GlobalData.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -16,10 +17,11 @@ class SettingView extends StatefulWidget {
 class _SettingViewState extends State<SettingView> {
   bool _isExpanded = false;
   final GlobalData dataController = Get.put(GlobalData());
+  final user = FirebaseAuth.instance.currentUser;
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       dataController.getGroups();
     });
   }
@@ -87,7 +89,7 @@ class _SettingViewState extends State<SettingView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'User Name',
+                          user?.email ?? "",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -95,7 +97,8 @@ class _SettingViewState extends State<SettingView> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'user@example.com',
+                          // user?.email??"",
+                          "Đã xác minh",
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
