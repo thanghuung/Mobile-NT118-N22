@@ -3,6 +3,7 @@ import 'package:app/common.dart';
 import 'package:app/component/FormGroup.dart';
 import 'package:app/state/GlobalData.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 enum TaskColor { pink, purple, blue, yellow }
@@ -125,7 +126,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   const SizedBox(width: 20),
                   DropdownButton<String>(
                     value: selectedPriority,
-                    onChanged: (String? newValue) {
+                    onChanged: (String? newValue) async {
                       setState(() {
                         selectedPriority = newValue!;
                       });
@@ -258,9 +259,11 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                       showToast("Hãy chọn thể loại của công việc!");
                       return;
                     }
+                    EasyLoading.show();
                     String color = selectedColor.toString().split('.').last;
-                    dataController.addTaskToFirebase(_content.text, _description.text, color,
+                    await dataController.addTaskToFirebase(_content.text, _description.text, color,
                         selectedPriority, selectedCategory, selectedDate);
+                    EasyLoading.dismiss();
                     Navigator.of(context).pop(); // Đóng bottom sheet sau khi tạo task
                   },
                   style: ElevatedButton.styleFrom(

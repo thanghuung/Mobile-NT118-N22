@@ -50,7 +50,7 @@ class GlobalData extends GetxController {
     }
   }
 
-  void addTaskToFirebase(String content, String description, String color, String priority,
+  Future<void> addTaskToFirebase(String content, String description, String color, String priority,
       Map<String, dynamic>? category, DateTime? dateDone) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('userId') ?? '';

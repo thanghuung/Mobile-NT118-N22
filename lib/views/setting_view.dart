@@ -1,4 +1,5 @@
 import 'package:app/AppColors.dart';
+import 'package:app/constants/routes.dart';
 import 'package:app/model/Group.dart';
 import 'package:app/state/GlobalData.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -109,6 +110,7 @@ class _SettingViewState extends State<SettingView> {
                   ),
                   IconButton(
                       onPressed: () {
+                        Navigator.pushNamed(context, settingPageRoute);
                         // Xử lý khi nhấn nút cài đặt
                         // Chuyển đến màn hình cài đặt người dùng
                       },

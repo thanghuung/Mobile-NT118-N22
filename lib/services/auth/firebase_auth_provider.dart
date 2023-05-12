@@ -93,6 +93,8 @@ class FirebaseAuthProvider implements AuthProvider {
     final user = _auth.currentUser;
     if (user != null) {
       await _auth.signOut();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove('userId');
     } else {
       throw UserNotLoggedInAuthException();
     }

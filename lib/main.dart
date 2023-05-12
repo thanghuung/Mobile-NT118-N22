@@ -4,6 +4,7 @@ import 'package:app/services/auth/firebase_auth_provider.dart';
 import 'package:app/views/home_view.dart';
 import 'package:app/views/login_view.dart';
 import 'package:app/views/register_view.dart';
+import 'package:app/views/setting/setting_page.dart';
 import 'package:app/views/verify_email_view.dart';
 import 'package:app/views/welcome.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -57,6 +58,7 @@ class _MyAppState extends State<MyApp> {
       ),
       home: currentPage,
       routes: {
+        settingPageRoute: (_) => SettingPage(),
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
         homeRoute: (context) => const HomePage(),
