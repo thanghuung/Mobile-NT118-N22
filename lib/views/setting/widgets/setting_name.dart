@@ -12,12 +12,15 @@ class SettingName extends StatelessWidget {
         children: const [
           Text(
             "Tên hiển thị",
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 17),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
           ),
           SizedBox(
             height: 2,
           ),
-          Text('nguyendinhtrai'),
+          Text(
+            'nguyendinhtrai',
+            style: TextStyle(fontSize: 11),
+          ),
         ],
       ),
     );

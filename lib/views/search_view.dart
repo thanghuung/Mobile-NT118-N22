@@ -19,26 +19,28 @@ class _SearchViewState extends State<SearchView> {
 
   TextEditingController _searchInput = TextEditingController();
   Future<void> getData() async {
-    if(_searchInput.text.trim() != ""){
+    if (_searchInput.text.trim() != "") {
       EasyLoading.show();
       final collectionRef = FirebaseFirestore.instance.collection('tasks');
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String userId = prefs.getString('userId') ?? "";
-      var querySnapshot = await collectionRef
-          .where('userID', isEqualTo: userId)
-          .get();
+      var querySnapshot =
+          await collectionRef.where('userID', isEqualTo: userId).get();
 
       // Xóa danh sách cũ trước khi thêm dữ liệu mới1
-      listData=[];
+      listData = [];
       for (var doc in querySnapshot.docs) {
-        if((doc['content']as String).contains(_searchInput.text)){
+        if ((doc['content'] as String).contains(_searchInput.text)) {
           Map<String, dynamic> taskData = doc.data();
           taskData['id'] = doc.id; // Lấy ID của category
           listData?.add(taskData);
         }
       }
-      setState(() {
-      });
+
+      if (querySnapshot.docs.isEmpty) {
+        listData = [];
+      }
+      setState(() {});
       EasyLoading.dismiss();
     }
   }
@@ -62,23 +64,26 @@ class _SearchViewState extends State<SearchView> {
                 width: MediaQuery.of(context).size.width - 32,
                 child: TextFormField(
                   controller: _searchInput,
-                  decoration: InputDecoration(
+                  onChanged: (value) {
+                    getData(); // Gọi hàm tìm kiếm khi giá trị thay đổi
+                  },
+                  decoration: const InputDecoration(
                       contentPadding: EdgeInsets.zero,
                       isDense: true,
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: TextButton(
-                        child: const Text(
-                          "Tìm",
-                          style: TextStyle(color: AppColors.pink),
-                        ),
-                        onPressed: () {
-                          getData();
-                        },
-                      ),
+                      prefixIcon: Icon(Icons.search),
+                      // suffixIcon: TextButton(
+                      //   child: const Text(
+                      //     "Tìm",
+                      //     style: TextStyle(color: AppColors.pink),
+                      //   ),
+                      //   onPressed: () {
+                      //     getData();
+                      //   },
+                      // ),
                       prefixIconColor: AppColors.pink,
-                      border: const OutlineInputBorder(),
-                      focusedBorder:
-                          const OutlineInputBorder(borderSide: BorderSide(color: AppColors.pink))),
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.pink))),
                 ),
               )
             ],
@@ -98,9 +103,9 @@ class _SearchViewState extends State<SearchView> {
                     child: Text("Danh sách trống"),
                   )
                 : SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
                         children: [
                           ...(listData ?? [])
                               .map((task) => NoteComponent(
@@ -110,17 +115,19 @@ class _SearchViewState extends State<SearchView> {
                                     isCompleted: task["isCompleted"],
                                     category: task["categoryID"],
                                     date: task["dateDone"],
-                                    backgroundColor: backgroundToColor(task["color"]),
+                                    backgroundColor:
+                                        backgroundToColor(task["color"]),
                                     priority: priorityToColor(task["priority"]),
                                     onCheckboxChanged: (value) => setState(() {
-                                      task["isCompleted"] = !task["isCompleted"];
+                                      task["isCompleted"] =
+                                          !task["isCompleted"];
                                     }),
                                   ))
                               .toList()
                         ],
                       ),
-                  ),
-                )),
+                    ),
+                  )),
       ),
     );
   }

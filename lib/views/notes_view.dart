@@ -17,7 +17,6 @@ class _NoteViewState extends State<NoteView> {
   final GlobalData dataController = Get.put(GlobalData());
   bool isLoading = true;
 
-
   @override
   void initState() {
     super.initState();
@@ -68,7 +67,8 @@ class _NoteViewState extends State<NoteView> {
                           ...List.generate(
                             controller.upcomingTasks.length,
                             (index) {
-                              final task = controller.upcomingTasks[index] ?? {};
+                              final task =
+                                  controller.upcomingTasks[index] ?? {};
                               return NoteComponent(
                                 id: task["id"],
                                 content: task["content"],
@@ -76,7 +76,8 @@ class _NoteViewState extends State<NoteView> {
                                 isCompleted: task["isCompleted"],
                                 category: task["categoryID"],
                                 date: task["dateDone"],
-                                backgroundColor: backgroundToColor(task["color"]),
+                                backgroundColor:
+                                    backgroundToColor(task["color"]),
                                 priority: priorityToColor(task["priority"]),
                                 onCheckboxChanged: (value) => setState(() {
                                   task["isCompleted"] = !task["isCompleted"];
@@ -111,7 +112,8 @@ class _NoteViewState extends State<NoteView> {
                                 isCompleted: task["isCompleted"],
                                 category: task["categoryID"],
                                 date: task["dateDone"],
-                                backgroundColor: backgroundToColor(task["color"]),
+                                backgroundColor:
+                                    backgroundToColor(task["color"]),
                                 priority: priorityToColor(task["priority"]),
                                 onCheckboxChanged: (value) => setState(() {
                                   task["isCompleted"] = !task["isCompleted"];
@@ -124,27 +126,82 @@ class _NoteViewState extends State<NoteView> {
                     }
                     return Column(
                       children: [
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          const Text(
-                            "Trễ hạn",
-                            style: AppFontText.title,
-                          ),
-                          TextButton(
-                            child: Text("Đặt lại",
-                                style: AppFontText.title.copyWith(color: AppColors.pink)),
-                            onPressed: () {},
-                          ),
-                        ]),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Trễ hạn",
+                                style: AppFontText.title,
+                              ),
+                              TextButton(
+                                child: Text("Đặt lại",
+                                    style: AppFontText.title
+                                        .copyWith(color: AppColors.pink)),
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return SingleChildScrollView(
+                                        padding: EdgeInsets.all(16),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Text(
+                                              'Đặt lại công việc trễ hạn',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            // SizedBox(height: 16),
+                                            CalendarDatePicker(
+                                              initialDate: DateTime.now(),
+                                              firstDate: DateTime.now(),
+                                              lastDate: DateTime(2100),
+                                              onDateChanged:
+                                                  (DateTime? selectedDate) {
+                                                // Xử lý khi ngày được chọn
+                                              },
+                                            ),
+                                            // SizedBox(height: 16),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                // Xử lý khi nhấn nút "Đặt"
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: AppColors
+                                                    .pink, // Màu nền của nút
+                                                padding: const EdgeInsets.all(
+                                                    4), // Padding xung quanh nút
+                                              ),
+                                              child: const Text(
+                                                'Đặt',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ]),
+                        const SizedBox(
+                          height: 14,
+                        ),
                         upcomingView,
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              "Hôm nay - ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+                              "Hôm nay - ${DateTime.now().day} tháng ${DateTime.now().month}, ${DateTime.now().year}",
                               style: AppFontText.title,
                             ),
                           ),
+                        ),
+                        const SizedBox(
+                          height: 14,
                         ),
                         todayView
                       ],

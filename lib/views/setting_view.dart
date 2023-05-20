@@ -34,36 +34,49 @@ class _SettingViewState extends State<SettingView> {
       context: Get.context!,
       builder: (context) {
         return AlertDialog(
-          title: Text('Tạo không gian làm việc'),
-          contentPadding: const EdgeInsets.all(16),
-          content: TextField(
-            controller: groupNameController,
-            decoration: InputDecoration(
-                labelText: "Tên không gian",
-                filled: true,
-                fillColor: Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5),
-                  borderSide: BorderSide.none,
-                )),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text('Hủy'),
+            title: Text('Tạo không gian làm việc'),
+            contentPadding: const EdgeInsets.all(16),
+            content: TextField(
+              controller: groupNameController,
+              decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide.none,
+                  )),
             ),
-            ElevatedButton(
-              onPressed: () {
-                final groupName = groupNameController.text;
-                if (groupName.isNotEmpty) {
-                  dataController.createGroup(groupName);
-                }
-                Get.back();
-              },
-              child: Text('Tạo'),
-            ),
-          ],
-        );
+            actions: [
+              Container(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child:
+                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.black, // Màu nền của nút
+                        padding:
+                            const EdgeInsets.all(4), // Padding xung quanh nút
+                      ),
+                      child: const Text('Hủy'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final groupName = groupNameController.text;
+                        if (groupName.isNotEmpty) {
+                          dataController.createGroup(groupName);
+                        }
+                        Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.pink, // Màu nền của nút
+                        padding:
+                            const EdgeInsets.all(4), // Padding xung quanh nút
+                      ),
+                      child: const Text('Tạo'),
+                    ),
+                  ]))
+            ]);
       },
     );
   }
@@ -230,8 +243,8 @@ class _SettingViewState extends State<SettingView> {
                       ),
                       Text(
                         "Thể loại cá nhân",
-                        style:
-                            TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                        style: TextStyle(
+                            fontSize: 16, color: Colors.grey.shade600),
                       )
                     ],
                   )),
@@ -292,9 +305,9 @@ class _SettingViewState extends State<SettingView> {
                                         foregroundColor:
                                             MaterialStateProperty.all<Color>(
                                                 Colors.black),
-                                        minimumSize:
-                                            MaterialStateProperty.all<Size>(
-                                                const Size(double.infinity, 60)),
+                                        minimumSize: MaterialStateProperty.all<
+                                                Size>(
+                                            const Size(double.infinity, 60)),
                                       ),
                                       child: Row(
                                         children: [

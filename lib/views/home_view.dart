@@ -45,13 +45,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      floatingActionButton: IconButton(
-        icon: Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-                color: AppColors.pink, borderRadius: BorderRadius.all(Radius.circular(100))),
-            child: Icon(Icons.add, color: Colors.white)),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.pink,
+        child: Icon(Icons.add, color: Colors.white, size: 20),
         onPressed: () {
           _showAddTaskBottomSheet(context);
         },

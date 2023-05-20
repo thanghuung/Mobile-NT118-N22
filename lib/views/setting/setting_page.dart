@@ -32,10 +32,14 @@ class SettingPage extends StatelessWidget {
                 style: AppFontText.title.copyWith(color: AppColors.pink),
               ),
               const SettingAvatar(),
-              const Divider(height: 1,),
+              const Divider(
+                height: 1,
+              ),
               const SettingName(),
               const SettingPassword(),
-              const Divider(height: 1,),
+              const Divider(
+                height: 1,
+              ),
               _buildButtonExit(context),
               const SettingDeleteAccount(),
               const SettingColor()
@@ -76,19 +80,22 @@ class SettingPage extends StatelessWidget {
         child: TextButton(
             onPressed: () async {
               final shouldLogout = await showLogOutDialog(context);
-                  if (shouldLogout) {
-                    await AuthService.firebase().logOut();
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      loginRoute,
-                      (_) => false,
-                    );
-                  }
+              if (shouldLogout) {
+                await AuthService.firebase().logOut();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  loginRoute,
+                  (_) => false,
+                );
+              }
             },
             child: const SizedBox(
               width: double.infinity,
               child: Text(
                 "Đăng xuất",
-                style: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500),
               ),
             )),
       ),
@@ -119,5 +126,4 @@ class SettingPage extends StatelessWidget {
           );
         }).then((value) => value ?? false);
   }
-
 }

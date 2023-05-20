@@ -32,7 +32,8 @@ class GlobalData extends GetxController {
       for (var doc in querySnapshot.docs) {
         final date = DateTime.fromMicrosecondsSinceEpoch(
             (doc.data()['dateDone'] as Timestamp).microsecondsSinceEpoch);
-        if (compareDate(date, DateTime.now()) == -1 && doc.data()['isCompleted'] == false) {
+        if (compareDate(date, DateTime.now()) == -1 &&
+            doc.data()['isCompleted'] == false) {
           Map<String, dynamic> taskData = doc.data();
           taskData['id'] = doc.id; // Lấy ID của category
           upcomingTasks.add(taskData);
@@ -50,8 +51,13 @@ class GlobalData extends GetxController {
     }
   }
 
-  Future<void> addTaskToFirebase(String content, String description, String color, String priority,
-      Map<String, dynamic>? category, DateTime? dateDone) async {
+  Future<void> addTaskToFirebase(
+      String content,
+      String description,
+      String color,
+      String priority,
+      Map<String, dynamic>? category,
+      DateTime? dateDone) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('userId') ?? '';
     print(userId);
@@ -94,7 +100,8 @@ class GlobalData extends GetxController {
   }
 
 // group
-  final CollectionReference groupsCollection = FirebaseFirestore.instance.collection('groups');
+  final CollectionReference groupsCollection =
+      FirebaseFirestore.instance.collection('groups');
 
   final RxList<Group> groups = RxList<Group>();
 
@@ -102,8 +109,12 @@ class GlobalData extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('userId') ?? '';
     try {
-      final docRef = await groupsCollection
-          .add({'groupName': groupName, 'hostID': userId, 'dateCreated': DateTime.now()});
+      final docRef = await groupsCollection.add({
+        'groupName': groupName,
+        'hostID': userId,
+        'members': [userId],
+        'dateCreated': DateTime.now()
+      });
       final newGroup = Group(id: docRef.id, name: groupName);
       groups.add(newGroup);
     } catch (error) {
