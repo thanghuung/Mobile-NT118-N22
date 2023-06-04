@@ -1,5 +1,7 @@
 import 'package:app/AppColors.dart';
 import 'package:app/constants/routes.dart';
+import 'package:app/route_manager/route_manager.dart';
+import 'package:app/services/auth/firebase_auth_provider.dart';
 import 'package:app/views/register_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,12 @@ class _WelcomeState extends State<Welcome> {
   void initState() {
     _email = TextEditingController();
     _password = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      String? userID = await FirebaseAuthProvider().getUserIdFromSharedPreferences();
+      if (userID != null) {
+        Navigator.pushNamed(context, RouteManager.homeRoute);
+      }
+    });
     super.initState();
   }
 
@@ -39,10 +47,7 @@ class _WelcomeState extends State<Welcome> {
               child: const Center(
                 child: Text(
                   'Xin chào!',
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -54,24 +59,18 @@ class _WelcomeState extends State<Welcome> {
                 children: [
                   TextSpan(
                     text: 'Đăng nhập vào ',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   TextSpan(
                     text: 'Todo',
-                    style: TextStyle(
-                        color: AppColors.pink,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(color: AppColors.pink, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   TextSpan(
                     text: 'os',
                     style: TextStyle(
-                        color: AppColors.purple,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
+                        color: AppColors.purple, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               )),
@@ -98,12 +97,9 @@ class _WelcomeState extends State<Welcome> {
                       fontSize: 18, // Kích thước font
                     )),
                 style: ButtonStyle(
-                  foregroundColor:
-                      MaterialStateProperty.all<Color>(Colors.white),
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(AppColors.orangeSecond),
-                  minimumSize: MaterialStateProperty.all<Size>(
-                      const Size(double.infinity, 60)),
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                  backgroundColor: MaterialStateProperty.all<Color>(AppColors.orangeSecond),
+                  minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
                 ),
               ),
             ),
@@ -111,8 +107,7 @@ class _WelcomeState extends State<Welcome> {
               padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
               child: TextButton.icon(
                 onPressed: () {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(loginRoute, (route) => false);
+                  Navigator.of(context).pushNamedAndRemoveUntil(loginRoute, (route) => false);
                 },
                 icon: const Icon(
                   Icons.email,
@@ -124,12 +119,9 @@ class _WelcomeState extends State<Welcome> {
                       fontSize: 18, // Kích thước font
                     )),
                 style: ButtonStyle(
-                  foregroundColor:
-                      MaterialStateProperty.all<Color>(Colors.white),
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(AppColors.pinkSecond),
-                  minimumSize: MaterialStateProperty.all<Size>(
-                      const Size(double.infinity, 60)),
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                  backgroundColor: MaterialStateProperty.all<Color>(AppColors.pinkSecond),
+                  minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
                 ),
               ),
             ),

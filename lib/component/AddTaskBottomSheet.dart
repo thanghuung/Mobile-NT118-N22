@@ -236,12 +236,12 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 items: categories.map<DropdownMenuItem<Map<String, dynamic>>>((category) {
                   return DropdownMenuItem<Map<String, dynamic>>(
                     value: category,
-                    child: Text(category['categoryName']),
+                    child: Text(category['name'] ?? ""),
                   );
                 }).toList(),
               ),
               const SizedBox(height: 30),
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {

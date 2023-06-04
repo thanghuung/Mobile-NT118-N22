@@ -1,23 +1,16 @@
-import 'package:app/constants/routes.dart';
 import 'package:app/firebase_options.dart';
+import 'package:app/route_manager/route_manager.dart';
 import 'package:app/services/auth/firebase_auth_provider.dart';
-import 'package:app/views/home_view.dart';
-import 'package:app/views/login_view.dart';
-import 'package:app/views/register_view.dart';
-import 'package:app/views/setting/setting_page.dart';
-import 'package:app/views/verify_email_view.dart';
-import 'package:app/views/welcome.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -29,42 +22,46 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   FirebaseAuthProvider authClass = FirebaseAuthProvider();
-  Widget currentPage = Welcome();
+  String currentPage = "";
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await checkLogin();
+    });
     super.initState();
     // authClass.signOut();
-    checkLogin();
   }
 
-  checkLogin() async {
+  Future<void>  checkLogin() async {
     String? userID = await authClass.getUserIdFromSharedPreferences();
-    print(userID);
-    if (userID != null)
+    if (userID != null){
       setState(() {
-        currentPage = HomePage();
+        currentPage = RouteManager.homeRoute;
       });
+    }else{
+      setState(() {
+        currentPage = RouteManager.welcomeRoute;
+      });
+    }
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      builder: EasyLoading.init(),
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: "Inter",
-      ),
-      home: currentPage,
-      routes: {
-        settingPageRoute: (_) => SettingPage(),
-        loginRoute: (context) => const LoginView(),
-        registerRoute: (context) => const RegisterView(),
-        homeRoute: (context) => const HomePage(),
-        verifyEmailRoute: (context) => const VerifyEmailView(),
-        welcomeRoute: (context) => const Welcome(),
-      },
+    return Builder(
+      builder: (context) {
+        return MaterialApp(
+          builder: EasyLoading.init(),
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            fontFamily: "Inter",
+          ),
+          onGenerateRoute: RouteManager.onGenerateRoute,
+          initialRoute: RouteManager.welcomeRoute,
+        );
+      }
     );
   }
 }

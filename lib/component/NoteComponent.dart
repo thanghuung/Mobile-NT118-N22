@@ -7,8 +7,8 @@ class NoteComponent extends StatefulWidget {
   final String id;
   final String content;
   final String description;
-  final bool isCompleted;
   final String category;
+  final String status;
   final Color? backgroundColor;
   final Color priority;
   final Timestamp date;
@@ -19,12 +19,12 @@ class NoteComponent extends StatefulWidget {
     required this.id,
     required this.content,
     required this.description,
-    required this.isCompleted,
     required this.category,
     required this.backgroundColor,
     required this.priority,
     required this.date,
     required this.onCheckboxChanged,
+    required this.status,
   }) : super(key: key);
 
   @override
@@ -40,8 +40,7 @@ class _NoteComponentState extends State<NoteComponent> {
   }
 
   void loadData() async {
-    final Map<String, dynamic>? fetchedCategory =
-        await getCategoryById(widget.category);
+    final Map<String, dynamic>? fetchedCategory = await getCategoryById(widget.category);
     if (fetchedCategory != null) {
       setState(() {
         category = fetchedCategory;
@@ -57,7 +56,7 @@ class _NoteComponentState extends State<NoteComponent> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-          color: !widget.isCompleted
+          color: !(widget.status == "done")
               ? (widget.backgroundColor ?? Colors.white)
               : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(12)),
@@ -67,27 +66,28 @@ class _NoteComponentState extends State<NoteComponent> {
           GestureDetector(
             onTap: () async {
               EasyLoading.show();
-              CollectionReference tasks =
-                  FirebaseFirestore.instance.collection('tasks');
+              CollectionReference tasks = FirebaseFirestore.instance.collection('tasks');
               await tasks
-                  .doc(widget.id)
-                  .update({'isCompleted': !widget.isCompleted}).then(
-                      (value) => print("tasks Updated"));
-              widget.onCheckboxChanged.call(!widget.isCompleted);
-              EasyLoading.dismiss();
+                  .doc(widget.id == ""? "ss": widget.id)
+                  .update({'status': "late"})
+                  .then((value) => print("tasks Updated"))
+                  .catchError((e) {
+                    EasyLoading.dismiss();
+                  })
+                  .whenComplete(() {
+                    widget.onCheckboxChanged.call(!(widget.status == "late"));
+                    EasyLoading.dismiss();
+                  });
             },
             child: Container(
               width: 20, // Chiều rộng của checkbox
               height: 20, // Chiều cao của checkbox
               decoration: BoxDecoration(
                 shape: BoxShape.circle, // Hình dạng hình tròn cho checkbox
-                border: Border.all(
-                    color: widget.priority,
-                    width: 2), // Viền màu hồng cho checkbox
-                color: widget.isCompleted
+                border: Border.all(color: widget.priority, width: 2), // Viền màu hồng cho checkbox
+                color: (widget.status == "done")
                     ? widget.priority
-                    : Colors
-                        .white, // Màu hồng khi được check, màu trong suốt khi chưa được check
+                    : Colors.white, // Màu hồng khi được check, màu trong suốt khi chưa được check
               ),
             ),
           ),
@@ -103,7 +103,7 @@ class _NoteComponentState extends State<NoteComponent> {
                     color: Colors.black,
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    decoration: widget.isCompleted
+                    decoration: (widget.status == "done")
                         ? TextDecoration.lineThrough
                         : TextDecoration.none),
               ),
@@ -113,9 +113,7 @@ class _NoteComponentState extends State<NoteComponent> {
               Text(
                 widget.description,
                 style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400),
+                    color: Colors.grey.shade500, fontSize: 14, fontWeight: FontWeight.w400),
               ),
               const SizedBox(
                 height: 10,
@@ -146,11 +144,9 @@ class _NoteComponentState extends State<NoteComponent> {
                     width: 15,
                   ),
                   Text(
-                    category != null ? category!["categoryName"] : "",
+                    category != null ? category!["categoryName"] ?? "" : "",
                     style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
+                        color: Colors.grey.shade600, fontSize: 12, fontWeight: FontWeight.w600),
                   )
                 ],
               )
@@ -161,7 +157,6 @@ class _NoteComponentState extends State<NoteComponent> {
     );
   }
 }
-
 
 // Dismissible(
 //         key: Key(widget.id),

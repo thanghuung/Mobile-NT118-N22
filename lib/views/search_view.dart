@@ -54,6 +54,7 @@ class _SearchViewState extends State<SearchView> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
+          leadingWidth: 0,
           elevation: 0,
           scrolledUnderElevation: 3,
           backgroundColor: Colors.white,
@@ -71,15 +72,6 @@ class _SearchViewState extends State<SearchView> {
                       contentPadding: EdgeInsets.zero,
                       isDense: true,
                       prefixIcon: Icon(Icons.search),
-                      // suffixIcon: TextButton(
-                      //   child: const Text(
-                      //     "Tìm",
-                      //     style: TextStyle(color: AppColors.pink),
-                      //   ),
-                      //   onPressed: () {
-                      //     getData();
-                      //   },
-                      // ),
                       prefixIconColor: AppColors.pink,
                       border: OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
@@ -112,7 +104,7 @@ class _SearchViewState extends State<SearchView> {
                                     id: task["id"],
                                     content: task["content"],
                                     description: task["description"],
-                                    isCompleted: task["isCompleted"],
+                                    status: task["status"],
                                     category: task["categoryID"],
                                     date: task["dateDone"],
                                     backgroundColor:

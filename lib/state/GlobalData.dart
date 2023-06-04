@@ -32,8 +32,7 @@ class GlobalData extends GetxController {
       for (var doc in querySnapshot.docs) {
         final date = DateTime.fromMicrosecondsSinceEpoch(
             (doc.data()['dateDone'] as Timestamp).microsecondsSinceEpoch);
-        if (compareDate(date, DateTime.now()) == -1 &&
-            doc.data()['isCompleted'] == false) {
+        if (compareDate(date, DateTime.now()) == -1 && doc.data()['isCompleted'] == false) {
           Map<String, dynamic> taskData = doc.data();
           taskData['id'] = doc.id; // Lấy ID của category
           upcomingTasks.add(taskData);
@@ -51,13 +50,8 @@ class GlobalData extends GetxController {
     }
   }
 
-  Future<void> addTaskToFirebase(
-      String content,
-      String description,
-      String color,
-      String priority,
-      Map<String, dynamic>? category,
-      DateTime? dateDone) async {
+  Future<void> addTaskToFirebase(String content, String description, String color, String priority,
+      Map<String, dynamic>? category, DateTime? dateDone) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('userId') ?? '';
     print(userId);
@@ -79,7 +73,8 @@ class GlobalData extends GetxController {
           'isCompleted': false,
           'isFavorite': false,
           'dateDone': dateDone,
-          'dateCreated': DateTime.now().toString(),
+          'dateCreated': DateTime.now(),
+          'dateStart': DateTime.now(),
           'userID': userId,
         };
 
@@ -100,8 +95,7 @@ class GlobalData extends GetxController {
   }
 
 // group
-  final CollectionReference groupsCollection =
-      FirebaseFirestore.instance.collection('groups');
+  final CollectionReference groupsCollection = FirebaseFirestore.instance.collection('groups');
 
   final RxList<Group> groups = RxList<Group>();
 
@@ -159,7 +153,10 @@ class GlobalData extends GetxController {
 /// -1 => <
 /// 0 => =
 /// 1 => >
-int compareDate(DateTime a, DateTime b) {
+int compareDate(DateTime? a, DateTime? b) {
+  if (a == null || b == null) {
+    return 0;
+  }
   if (a.year > b.year) {
     return 1;
   } else {

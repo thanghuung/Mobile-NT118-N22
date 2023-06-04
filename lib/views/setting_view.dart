@@ -1,6 +1,7 @@
 import 'package:app/AppColors.dart';
 import 'package:app/constants/routes.dart';
 import 'package:app/model/Group.dart';
+import 'package:app/route_manager/route_manager.dart';
 import 'package:app/state/GlobalData.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -199,7 +200,6 @@ class _SettingViewState extends State<SettingView> {
                       onPressed: () {},
                       style: ButtonStyle(
                         // border:
-
                         foregroundColor:
                             MaterialStateProperty.all<Color>(Colors.black),
                         minimumSize: MaterialStateProperty.all<Size>(
@@ -225,7 +225,9 @@ class _SettingViewState extends State<SettingView> {
               ),
               const Divider(),
               TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, RouteManager.categoryScreen);
+                  },
                   style: ButtonStyle(
                     foregroundColor:
                         MaterialStateProperty.all<Color>(Colors.black),

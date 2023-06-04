@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.pink,
-        child: Icon(Icons.add, color: Colors.white, size: 20),
+        child: const Icon(Icons.add, color: Colors.white, size: 20),
         onPressed: () {
           _showAddTaskBottomSheet(context);
         },
