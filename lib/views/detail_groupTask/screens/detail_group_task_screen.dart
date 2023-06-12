@@ -1,21 +1,23 @@
-import 'package:app/views/detail_task/blocs/detail_task_bloc.dart';
-import 'package:app/views/detail_task/widgets/filter_task.dart';
-import 'package:app/views/detail_task/widgets/list_item_task.dart';
+import 'package:app/route_manager/route_manager.dart';
+import 'package:app/views/detail_groupTask/widgets/filter_task.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DetailTaskScreen extends StatelessWidget {
-  const DetailTaskScreen({Key? key}) : super(key: key);
+import '../blocs/detail_group_task_bloc.dart';
+import '../widgets/list_item_task.dart';
+
+class DetailGroupTaskScreen extends StatelessWidget {
+  const DetailGroupTaskScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DetailTaskBloc, DetailTaskState>(
+    return BlocBuilder<DetailGroupTaskBloc, DetailGroupTaskState>(
       builder: (context, state) {
         final Widget body;
-        if (state is DetailTaskLoading) {
+        if (state is DetailGroupTaskLoading) {
           body = Container();
         } else {
-          body = ListItemTask(
+          body = ListItemGroupTask(
             key: UniqueKey(),
             listData: state.listData,
           );
@@ -34,14 +36,26 @@ class DetailTaskScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             elevation: 0,
             title: const Text(
-              "Chi tiết công việc",
+              "Không gian làm việc",
               style: TextStyle(color: Colors.black),
             ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, RouteManager.settingGroupTaskScreen,
+                      arguments: state.groupID);
+                },
+                icon: const Icon(
+                  Icons.settings,
+                  color: Colors.black,
+                ),
+              ),
+            ],
           ),
           body: Column(
             children: [
               Expanded(child: body),
-              const FilterTask(),
+              const FilterGroupTask(),
             ],
           ),
         );

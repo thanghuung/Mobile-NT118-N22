@@ -1,6 +1,8 @@
 import 'package:app/AppColors.dart';
+import 'package:app/component/addGroupBottomSheet.dart';
 import 'package:app/constants/routes.dart';
-import 'package:app/model/Group.dart';
+import 'package:app/fire_base/group_controller.dart';
+import 'package:app/model/group_model.dart';
 import 'package:app/route_manager/route_manager.dart';
 import 'package:app/state/GlobalData.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,22 +19,25 @@ class SettingView extends StatefulWidget {
 }
 
 class _SettingViewState extends State<SettingView> {
-  bool _isExpanded = false;
   final GlobalData dataController = Get.put(GlobalData());
   final user = FirebaseAuth.instance.currentUser;
+  Future<List<GroupModel>>? groups;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      dataController.getGroups();
-    });
+    loadGroup();
   }
 
-  void showCreateGroupDialog() {
-    print(dataController.groups);
+  void loadGroup() {
+    groups = GroupController.getGroups();
+    setState(() {});
+  }
+
+  void showCreateGroupDialog(BuildContext context) {
     final TextEditingController groupNameController = TextEditingController();
     showDialog(
-      context: Get.context!,
+      context: context,
       builder: (context) {
         return AlertDialog(
             title: Text('Tạo không gian làm việc'),
@@ -50,14 +55,12 @@ class _SettingViewState extends State<SettingView> {
             actions: [
               Container(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child:
-                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                     TextButton(
-                      onPressed: () => Get.back(),
+                      onPressed: () => Navigator.pop(context),
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.black, // Màu nền của nút
-                        padding:
-                            const EdgeInsets.all(4), // Padding xung quanh nút
+                        padding: const EdgeInsets.all(4), // Padding xung quanh nút
                       ),
                       child: const Text('Hủy'),
                     ),
@@ -65,14 +68,13 @@ class _SettingViewState extends State<SettingView> {
                       onPressed: () {
                         final groupName = groupNameController.text;
                         if (groupName.isNotEmpty) {
-                          dataController.createGroup(groupName);
+                          // dataController.createGroup(groupName);
                         }
                         Get.back();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.pink, // Màu nền của nút
-                        padding:
-                            const EdgeInsets.all(4), // Padding xung quanh nút
+                        padding: const EdgeInsets.all(4), // Padding xung quanh nút
                       ),
                       child: const Text('Tạo'),
                     ),
@@ -84,266 +86,261 @@ class _SettingViewState extends State<SettingView> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: SafeArea(
-        child: Container(
+    return SafeArea(
+      child: Container(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 25, // Kích thước của Avatar
-                    backgroundImage: NetworkImage(
-                        'https://ath2.unileverservices.com/wp-content/uploads/sites/4/2020/02/IG-annvmariv.jpg'),
+          child: Column(children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 25, // Kích thước của Avatar
+                  backgroundImage: NetworkImage(
+                      'https://ath2.unileverservices.com/wp-content/uploads/sites/4/2020/02/IG-annvmariv.jpg'),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user?.email ?? "",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        // user?.email??"",
+                        "Đã xác minh",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, settingPageRoute);
+                      // Xử lý khi nhấn nút cài đặt
+                      // Chuyển đến màn hình cài đặt người dùng
+                    },
+                    hoverColor: Colors.transparent,
+                    splashColor: Colors.transparent,
+                    icon: const Icon(
+                      Icons.settings,
+                    )),
+              ],
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            Column(
+              children: [
+                TextButton(
+                    onPressed: () {},
+                    style: ButtonStyle(
+                      // border:
+                      foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                      minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
+                    ),
+                    child: Row(
                       children: [
-                        Text(
-                          user?.email ?? "",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        const Icon(
+                          Icons.calendar_today,
+                          color: AppColors.blue,
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          // user?.email??"",
-                          "Đã xác minh",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
+                        const SizedBox(
+                          width: 10,
                         ),
+                        Text(
+                          "Hôm nay",
+                          style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                        )
                       ],
+                    )),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextButton(
+                    onPressed: () {},
+                    style: ButtonStyle(
+                      // border:
+                      foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                      minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.check,
+                          color: AppColors.purple,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Hoàn thành",
+                          style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                        )
+                      ],
+                    )),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextButton(
+                    onPressed: () {},
+                    style: ButtonStyle(
+                      // border:
+                      foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                      minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.favorite,
+                          color: AppColors.pink,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Yêu thích",
+                          style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                        )
+                      ],
+                    ))
+              ],
+            ),
+            const Divider(),
+            TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, RouteManager.categoryScreen);
+                },
+                style: ButtonStyle(
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                  minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.category,
+                      color: AppColors.red,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      "Thể loại cá nhân",
+                      style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+                    )
+                  ],
+                )),
+            const Divider(),
+            Expanded(
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      "Không gian làm việc",
+                      style: TextStyle(
+                          color: Colors.grey.shade600, fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          context: context,
+                          useSafeArea: true,
+                          builder: (context) => SingleChildScrollView(
+                            child: Container(
+                                padding: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                                child: AddGroupBottomSheet(onCallback: loadGroup)),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  IconButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, settingPageRoute);
-                        // Xử lý khi nhấn nút cài đặt
-                        // Chuyển đến màn hình cài đặt người dùng
-                      },
-                      hoverColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      icon: const Icon(
-                        Icons.settings,
-                      )),
-                ],
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              Column(
-                children: [
-                  TextButton(
-                      onPressed: () {},
-                      style: ButtonStyle(
-                        // border:
-                        foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.black),
-                        minimumSize: MaterialStateProperty.all<Size>(
-                            const Size(double.infinity, 60)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_today,
-                            color: AppColors.blue,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Hôm nay",
-                            style: TextStyle(
-                                fontSize: 16, color: Colors.grey.shade600),
-                          )
-                        ],
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  TextButton(
-                      onPressed: () {},
-                      style: ButtonStyle(
-                        // border:
-                        foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.black),
-                        minimumSize: MaterialStateProperty.all<Size>(
-                            const Size(double.infinity, 60)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.check,
-                            color: AppColors.purple,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Hoàn thành",
-                            style: TextStyle(
-                                fontSize: 16, color: Colors.grey.shade600),
-                          )
-                        ],
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  TextButton(
-                      onPressed: () {},
-                      style: ButtonStyle(
-                        // border:
-                        foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.black),
-                        minimumSize: MaterialStateProperty.all<Size>(
-                            const Size(double.infinity, 60)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.favorite,
-                            color: AppColors.pink,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Yêu thích",
-                            style: TextStyle(
-                                fontSize: 16, color: Colors.grey.shade600),
-                          )
-                        ],
-                      ))
-                ],
-              ),
-              const Divider(),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, RouteManager.categoryScreen);
-                  },
-                  style: ButtonStyle(
-                    foregroundColor:
-                        MaterialStateProperty.all<Color>(Colors.black),
-                    minimumSize: MaterialStateProperty.all<Size>(
-                        const Size(double.infinity, 60)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.category,
-                        color: AppColors.red,
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        "Thể loại cá nhân",
-                        style: TextStyle(
-                            fontSize: 16, color: Colors.grey.shade600),
-                      )
-                    ],
-                  )),
-              const Divider(),
-              Column(
-                children: [
-                  ExpansionPanelList(
-                    elevation: 1,
-                    expandedHeaderPadding: EdgeInsets.zero,
-                    expansionCallback: (int index, bool isExpanded) {
-                      setState(() {
-                        _isExpanded = !isExpanded;
-                      });
-                    },
-                    children: [
-                      ExpansionPanel(
-                        headerBuilder: (BuildContext context, bool isExpanded) {
-                          return ListTile(
-                            title: Text(
-                              "Không gian làm việc",
-                              style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: showCreateGroupDialog,
-                            ),
-                          );
-                        },
-                        body: Obx(() {
-                          final List<Group> groups = dataController.groups;
-                          if (groups.isEmpty) {
-                            return Container(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              child: Text(
-                                "Chưa có không gian nào!",
-                                style: TextStyle(fontSize: 16),
-                              ),
+                  Expanded(
+                    child: FutureBuilder<List<GroupModel>>(
+                        future: groups,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                              child: Text("dang tai.."),
                             );
                           }
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: groups
-                                  .map(
-                                    (group) => TextButton(
-                                      onPressed: () {
-                                        // Xử lý khi nhấn vào nút của nhóm
-                                        // Chuyển đến màn hình chi tiết nhóm
-                                      },
-                                      style: ButtonStyle(
-                                        foregroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                Colors.black),
-                                        minimumSize: MaterialStateProperty.all<
-                                                Size>(
-                                            const Size(double.infinity, 60)),
-                                      ),
-                                      child: Row(
+                          return GridView.count(
+                            primary: false,
+                            padding: const EdgeInsets.all(20),
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            crossAxisCount: 2,
+                            children: (snapshot.data ?? [])
+                                .map(
+                                  (group) => GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(context, RouteManager.groupTaskScreen, arguments: group.id);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                          border: Border.all(color: AppColors.pink)),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
                                         children: [
-                                          const Icon(
-                                            Icons.circle,
-                                            color: AppColors.orange,
-                                          ),
                                           const SizedBox(
-                                            width: 10,
+                                            height: 4,
                                           ),
                                           Text(
-                                            group.name,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.grey.shade600),
+                                            group.name ?? "",
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              color: AppColors.pink,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(16),
+                                            child: Text(
+                                              group.des ?? "",
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w300,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Row(
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text("Thành viên: "),
+                                                Text((group.numUser ?? 0).toString())
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 8,
                                           )
                                         ],
                                       ),
                                     ),
-                                  )
-                                  .toList(),
-                            ),
+                                  ),
+                                )
+                                .toList(),
                           );
                         }),
-                        isExpanded: _isExpanded,
-                      ),
-                    ],
                   )
                 ],
-              )
-            ],
-          ),
-        ),
-      ),
+              ),
+            )
+          ])),
     );
   }
 }

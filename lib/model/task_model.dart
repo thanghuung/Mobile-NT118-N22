@@ -3,13 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class TaskModel {
   String? id;
   String? categoryID;
+  String? groupID;
   String? color;
   String? content;
   DateTime? dateCreated;
   DateTime? dateStart;
   DateTime? dateDone;
   String? description;
-  String? status;
+  bool? isCompleted;
   bool? isFavorite;
   String? priority;
   String? userID;
@@ -19,11 +20,12 @@ class TaskModel {
       this.categoryID,
       this.color,
       this.content,
+      this.groupID,
       this.dateCreated,
       this.dateStart,
       this.dateDone,
       this.description,
-      this.status,
+      required this.isCompleted,
       this.isFavorite,
       this.priority,
       this.userID});
@@ -40,10 +42,11 @@ class TaskModel {
     dateDone =
         DateTime.fromMicrosecondsSinceEpoch((json['dateDone'] as Timestamp).microsecondsSinceEpoch);
     description = json['description'];
-    status = json['status'];
+    isCompleted = json['isCompleted'];
     isFavorite = json['isFavorite'];
     priority = json['priority'];
     userID = json['userID'];
+    groupID = json['groupID'];
   }
 
   Map<String, dynamic> toJson() {
@@ -56,10 +59,11 @@ class TaskModel {
     data['dateStart'] = this.dateStart;
     data['dateDone'] = this.dateDone;
     data['description'] = this.description;
-    data['status'] = this.status;
+    data['isCompleted'] = this.isCompleted;
     data['isFavorite'] = this.isFavorite;
     data['priority'] = this.priority;
     data['userID'] = this.userID;
+    data['groupID'] = this.groupID;
     return data;
   }
 }

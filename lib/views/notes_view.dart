@@ -72,16 +72,14 @@ class _NoteViewState extends State<NoteView> {
                               final task = controller.upcomingTasks[index] ?? {};
                               return NoteComponent(
                                 id: task["id"],
+                                dateStart: task["dateStart"],
                                 content: task["content"]??"",
                                 description: task["description"]??"",
-                                status: task["status"]??"",
+                                isCompleted: task["isCompleted"]??false,
                                 category: task["categoryID"]??"",
                                 date: task["dateDone"]??"",
                                 backgroundColor: backgroundToColor(task["color"]),
                                 priority: priorityToColor(task["priority"]),
-                                onCheckboxChanged: (value) => setState(() {
-                                  task["isCompleted"] = !task["isCompleted"];
-                                }),
                               );
                             },
                           )
@@ -108,15 +106,13 @@ class _NoteViewState extends State<NoteView> {
                               return NoteComponent(
                                 id: task["id"]??"",
                                 content: task["content"]??"",
+                                dateStart: task["dateStart"],
                                 description: task["description"]??"",
-                                status: task["status"]??"",
+                                isCompleted: task["isCompleted"],
                                 category: task["categoryID"]??"",
                                 date: task["dateDone"]??"",
                                 backgroundColor: backgroundToColor(task["color"]),
                                 priority: priorityToColor(task["priority"]),
-                                onCheckboxChanged: (value) => setState(() {
-                                  task["isCompleted"] = !task["isCompleted"];
-                                }),
                               );
                             },
                           )

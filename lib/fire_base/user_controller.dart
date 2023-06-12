@@ -1,54 +1,22 @@
-import 'package:app/model/task_model.dart';
-import 'package:app/state/GlobalData.dart';
+import 'package:app/model/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class TaskController {
+class UserController {
   static final String uuid = FirebaseAuth.instance.currentUser?.uid ?? "";
 
-  static Future<void> addTask(TaskModel taskModel) async {
-    await FirebaseFirestore.instance.collection('tasks').add(taskModel.toJson());
+  static Future<void> addData(String name, String des) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .add({"name": name, "description": des, "userID": uuid});
   }
 
-  static Future<List<TaskModel>> getListData(TaskParam param) async {
-    final listData = await FirebaseFirestore.instance
-        .collection('tasks')
-        .where('userID', isEqualTo: uuid)
-        .get()
-        .then((value) => value.docs.map((e) {
-              final data = TaskModel.fromJson(e.data());
-              data.id = e.id;
-              return data;
-            }).toList());
-
-    switch (param.status) {
-      case 'pending':
-        return listData
-            .where((element) => compareDate(DateTime.now(), element.dateStart) == -1)
-            .toList();
-      case 'process':
-        return listData
-            .where((element) =>
-                compareDate(DateTime.now(), element.dateDone) == -1 &&
-                compareDate(DateTime.now(), element.dateStart) >= 0)
-            .toList();
-      case 'done':
-        return listData.where((element) => element.status == "done").toList();
-      case 'late':
-        return listData
-            .where((element) =>
-                (compareDate(DateTime.now(), element.dateDone) == 1 && element.status != 'done'))
-            .toList();
-      default:
-        return listData;
-    }
+  static Future<List<UserModel>> getListData() async {
+    var dataList = await FirebaseFirestore.instance.collection('users').get();
+    return dataList.docs.map((e) {
+      final result = UserModel.fromJson(e.data());
+      result.id = e.id;
+      return result;
+    }).toList();
   }
-}
-
-class TaskParam {
-  final String? status;
-  final String? categoryID;
-  final String? spaceID;
-
-  TaskParam({this.status, this.categoryID, this.spaceID});
 }

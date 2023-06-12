@@ -1,3 +1,5 @@
+import 'package:app/AppColors.dart';
+import 'package:app/route_manager/route_manager.dart';
 import 'package:app/views/category/blocs/category_cubit.dart';
 import 'package:app/views/category/blocs/category_cubit.dart';
 import 'package:app/views/category/widgets/category_item.dart';
@@ -24,9 +26,15 @@ class CategoryScreen extends StatelessWidget {
                 children: [
                   ...List.generate(
                     state.listData.length,
-                    (index) => CategoryItem(
-                      title: state.listData[index].name ?? "",
-                      countWork: state.listData[index].countWork ?? 0,
+                    (index) => GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, RouteManager.detailTaskScreen,
+                            arguments: state.listData[index].id);
+                      },
+                      child: CategoryItem(
+                        title: state.listData[index].name ?? "",
+                        countWork: state.listData[index].countWork ?? 0,
+                      ),
                     ),
                   ),
                   const CategoryButtonAdd()
@@ -49,6 +57,7 @@ class CategoryScreen extends StatelessWidget {
                   Navigator.pop(context);
                 },
               ),
+
             ),
             body: body);
       },

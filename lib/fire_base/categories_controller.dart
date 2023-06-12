@@ -24,11 +24,12 @@ class CategoryController {
     return categoryTable.docs.map((e) {
       int count = 0;
       for (var i in taskTable.docs) {
-        if (i['categoryID'] == e.id) {
+        if (i["categoryID"] == e.id) {
           count++;
         }
       }
       final result = CategoryModel.fromJson(e.data());
+      result.id = e.id;
       result.countWork = count;
       return result;
     }).toList();

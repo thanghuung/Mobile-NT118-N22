@@ -5,6 +5,7 @@ import 'package:app/views/noti_view.dart';
 import 'package:app/views/search_view.dart';
 import 'package:app/views/setting_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -43,57 +44,63 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.pink,
-        child: const Icon(Icons.add, color: Colors.white, size: 20),
-        onPressed: () {
-          _showAddTaskBottomSheet(context);
-        },
-      ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                color: Colors.grey.shade300,
-                width: 1.0,
+    return WillPopScope(
+      onWillPop: (){
+        SystemNavigator.pop();
+        return Future.value(false);
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.pink,
+          child: const Icon(Icons.add, color: Colors.white, size: 20),
+          onPressed: () {
+            _showAddTaskBottomSheet(context);
+          },
+        ),
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: Colors.grey.shade300,
+                  width: 1.0,
+                ),
               ),
             ),
-          ),
-          child: GNav(
-            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-            activeColor: AppColors.pink,
-            duration: Duration(milliseconds: 0),
-            hoverColor: Colors.transparent,
-            gap: 8,
-            color: Colors.grey.shade600,
-            onTabChange: (index) {
-              setState(() {
-                // isSidebarOpen = false;
-                _selectedIndex = index;
-              });
-            },
-            tabs: const [
-              GButton(
-                icon: Icons.home,
-              ),
-              GButton(
-                icon: Icons.search,
-              ),
-              GButton(
-                icon: Icons.notifications,
-              ),
-              GButton(
-                icon: Icons.person_outline_sharp,
-              ),
-            ],
-          )),
+            child: GNav(
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+              activeColor: AppColors.pink,
+              duration: const Duration(milliseconds: 0),
+              hoverColor: Colors.transparent,
+              gap: 8,
+              color: Colors.grey.shade600,
+              onTabChange: (index) {
+                setState(() {
+                  // isSidebarOpen = false;
+                  _selectedIndex = index;
+                });
+              },
+              tabs: const [
+                GButton(
+                  icon: Icons.home,
+                ),
+                GButton(
+                  icon: Icons.search,
+                ),
+                GButton(
+                  icon: Icons.notifications,
+                ),
+                GButton(
+                  icon: Icons.person_outline_sharp,
+                ),
+              ],
+            )),
+      ),
     );
   }
 

@@ -22,18 +22,18 @@ class ListItemTask extends StatelessWidget {
               height: 16,
             ),
             ...listData
-                .map((e) => NoteComponent(
-                    id: e.id ?? "s",
+                .map((e) {
+                  return NoteComponent(
+                    id: e.id ?? "",
                     content: e.content ?? "",
                     description: e.description ?? "",
-                    status: e.status ?? "",
+                    isCompleted: e.isCompleted ?? false,
                     category: e.categoryID ?? "",
                     backgroundColor: backgroundToColor(e.color ?? ""),
                     priority: priorityToColor(e.priority ?? ""),
-                    date: Timestamp.fromDate(e.dateDone ?? DateTime.now()),
-                    onCheckboxChanged: (check) {
-                      context.read<DetailTaskBloc>().add(OnGetData());
-                    }))
+                    dateStart: Timestamp.fromDate(e.dateStart ?? DateTime.now()),
+                    date: Timestamp.fromDate(e.dateDone ?? DateTime.now()));
+                })
                 .toList()
           ],
         ),

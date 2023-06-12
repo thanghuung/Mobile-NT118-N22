@@ -24,8 +24,7 @@ class _SearchViewState extends State<SearchView> {
       final collectionRef = FirebaseFirestore.instance.collection('tasks');
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String userId = prefs.getString('userId') ?? "";
-      var querySnapshot =
-          await collectionRef.where('userID', isEqualTo: userId).get();
+      var querySnapshot = await collectionRef.where('userID', isEqualTo: userId).get();
 
       // Xóa danh sách cũ trước khi thêm dữ liệu mới1
       listData = [];
@@ -74,8 +73,8 @@ class _SearchViewState extends State<SearchView> {
                       prefixIcon: Icon(Icons.search),
                       prefixIconColor: AppColors.pink,
                       border: OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: AppColors.pink))),
+                      focusedBorder:
+                          OutlineInputBorder(borderSide: BorderSide(color: AppColors.pink))),
                 ),
               )
             ],
@@ -100,21 +99,19 @@ class _SearchViewState extends State<SearchView> {
                       child: Column(
                         children: [
                           ...(listData ?? [])
-                              .map((task) => NoteComponent(
-                                    id: task["id"],
-                                    content: task["content"],
-                                    description: task["description"],
-                                    status: task["status"],
-                                    category: task["categoryID"],
-                                    date: task["dateDone"],
-                                    backgroundColor:
-                                        backgroundToColor(task["color"]),
-                                    priority: priorityToColor(task["priority"]),
-                                    onCheckboxChanged: (value) => setState(() {
-                                      task["isCompleted"] =
-                                          !task["isCompleted"];
-                                    }),
-                                  ))
+                              .map(
+                                (task) => NoteComponent(
+                                  dateStart: task["dateStart"],
+                                  id: task["id"],
+                                  content: task["content"],
+                                  description: task["description"],
+                                  isCompleted: task["isCompleted"],
+                                  category: task["categoryID"],
+                                  date: task["dateDone"],
+                                  backgroundColor: backgroundToColor(task["color"]),
+                                  priority: priorityToColor(task["priority"]),
+                                ),
+                              )
                               .toList()
                         ],
                       ),

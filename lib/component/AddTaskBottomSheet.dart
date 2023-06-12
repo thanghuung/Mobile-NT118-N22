@@ -20,7 +20,8 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   late final TextEditingController _content;
   late final TextEditingController _description;
   final _formKey = GlobalKey<FormState>();
-  DateTime? selectedDate;
+  DateTime? selectedDateEnd;
+  DateTime? selectedDateStart;
   String selectedPriority = "Không ưu tiên";
   TaskColor selectedColor = TaskColor.pink;
   Map<String, dynamic>? selectedCategory;
@@ -33,7 +34,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     loadCategories();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDateEnd(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -41,9 +42,24 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
       lastDate: DateTime.now().add(Duration(days: 365)),
     );
 
-    if (picked != null && picked != selectedDate) {
+    if (picked != null && picked != selectedDateEnd) {
       setState(() {
-        selectedDate = picked;
+        selectedDateEnd = picked;
+      });
+    }
+  }
+
+  Future<void> _selectDateStart(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 365)),
+    );
+
+    if (picked != null && picked != selectedDateStart) {
+      setState(() {
+        selectedDateStart = picked;
       });
     }
   }
@@ -107,14 +123,16 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 isPassword: false,
               ),
               const SizedBox(height: 16),
-              Row(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: () => _selectDate(context),
+                    onPressed: () => _selectDateStart(context),
                     icon: Icon(Icons.calendar_today), // Biểu tượng (icon)
                     label: Text(
-                      selectedDate == null ? 'Chọn ngày' : formatDate(selectedDate!),
+                      selectedDateStart == null
+                          ? 'Chọn ngày bắt đầu'
+                          : formatDate(selectedDateStart!),
                     ), // Chữ
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white, // Màu nền của button
@@ -123,7 +141,23 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                       side: BorderSide(color: Colors.grey.shade600, width: 1), // Padding cho button
                     ),
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () => _selectDateEnd(context),
+                    icon: Icon(Icons.calendar_today), // Biểu tượng (icon)
+                    label: Text(
+                      selectedDateEnd == null ? 'Chọn ngày kết thúc' : formatDate(selectedDateEnd!),
+                    ), // Chữ
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white, // Màu nền của button
+                      foregroundColor: Colors.grey.shade600,
+                      padding: EdgeInsets.all(12),
+                      side: BorderSide(color: Colors.grey.shade600, width: 1), // Padding cho button
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   DropdownButton<String>(
                     value: selectedPriority,
                     onChanged: (String? newValue) async {
@@ -250,11 +284,14 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                     } else {
                       return;
                     }
-                    if (selectedDate == null) {
+                    if (selectedDateEnd == null) {
                       showToast("Hãy chọn ngày kết thúc của công việc!");
                       return;
                     }
-
+                    if (selectedDateStart == null) {
+                      showToast("Hãy chọn ngày bắt đầu của công việc!");
+                      return;
+                    }
                     if (selectedCategory == null) {
                       showToast("Hãy chọn thể loại của công việc!");
                       return;
@@ -262,7 +299,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                     EasyLoading.show();
                     String color = selectedColor.toString().split('.').last;
                     await dataController.addTaskToFirebase(_content.text, _description.text, color,
-                        selectedPriority, selectedCategory, selectedDate);
+                        selectedPriority, selectedCategory, selectedDateEnd, selectedDateStart);
                     EasyLoading.dismiss();
                     Navigator.of(context).pop(); // Đóng bottom sheet sau khi tạo task
                   },

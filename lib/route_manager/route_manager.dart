@@ -1,9 +1,11 @@
 import 'package:app/views/category/category_screen.dart';
+import 'package:app/views/detail_groupTask/blocs/detail_group_task_bloc.dart';
+import 'package:app/views/detail_groupTask/screens/detail_group_task_setting_screen.dart';
 import 'package:app/views/detail_task/screens/detail_task_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../views/category/blocs/category_cubit.dart';
+import '../views/detail_groupTask/screens/detail_group_task_screen.dart';
 import '../views/detail_task/blocs/detail_task_bloc.dart';
 import '../views/home_view.dart';
 import '../views/login_view.dart';
@@ -21,11 +23,18 @@ class RouteManager {
   static const String settingPageRoute = "/settingPage";
   static const String categoryScreen = "/categoryScreen";
   static const String detailTaskScreen = "/detailTaskScreen";
+  static const String groupTaskScreen = "/detailGroupTaskScreen";
+  static const String settingGroupTaskScreen = "/settingGroupTaskScreen";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case loginRoute:
         return MaterialPageRoute(builder: (_) => const LoginView());
+      case settingGroupTaskScreen:
+        return MaterialPageRoute(builder: (_) {
+          final string = settings.arguments as String?;
+          return DetailGroupTaskSettingScreen(groupID: string??"",);
+        });
       case welcomeRoute:
         return MaterialPageRoute(builder: (_) => const Welcome());
       case registerRoute:
@@ -45,9 +54,22 @@ class RouteManager {
         );
       case detailTaskScreen:
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => DetailTaskBloc()..add(OnGetData()),
+          builder: (context) => BlocProvider(
+            create: (context) {
+              final string = settings.arguments as String?;
+              return DetailTaskBloc(string)..add(OnGetData());
+            },
             child: const DetailTaskScreen(),
+          ),
+        );
+      case groupTaskScreen:
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider(
+            create: (context) {
+              final string = settings.arguments as String?;
+              return DetailGroupTaskBloc(string)..add(OnGetDataGroup());
+            },
+            child: const DetailGroupTaskScreen(),
           ),
         );
       default:

@@ -4,14 +4,15 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:meta/meta.dart';
 
-import '../../../fire_base/user_controller.dart';
+import '../../../fire_base/task_controller.dart';
 import '../../../model/task_model.dart';
 
 part 'detail_task_event.dart';
 part 'detail_task_state.dart';
 
 class DetailTaskBloc extends Bloc<DetailTaskEvent, DetailTaskState> {
-  DetailTaskBloc() : super(const DetailTaskLoading([])) {
+  final String? categoryID;
+  DetailTaskBloc(this.categoryID) : super(DetailTaskLoading([], categoryID)) {
     on<DetailTaskEvent>((event, emit) {
       // TODO: implement event handler
     });
@@ -20,12 +21,15 @@ class DetailTaskBloc extends Bloc<DetailTaskEvent, DetailTaskState> {
       EasyLoading.show();
       switch (event.status ?? "all") {
         case "all":
-          final listData = await TaskController.getListData(TaskParam());
-          emit(DetailTaskHasData(listData));
+          final listData =
+              await TaskController.getListData(TaskParam(), category: state.categoriesID);
+          emit(DetailTaskHasData(listData, state.categoriesID));
           break;
         default:
-          final listData = await TaskController.getListData(TaskParam(status: event.status));
-          emit(DetailTaskHasData(listData));
+          final listData = await TaskController.getListData(
+              TaskParam(status: event.status, categoryID: state.categoriesID),
+              category: state.categoriesID);
+          emit(DetailTaskHasData(listData, state.categoriesID));
           break;
       }
       EasyLoading.dismiss();
