@@ -8,7 +8,6 @@ import 'package:app/state/GlobalData.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:get/get.dart';
 
 class SettingView extends StatefulWidget {
@@ -284,8 +283,9 @@ class _SettingViewState extends State<SettingView> {
                             children: (snapshot.data ?? [])
                                 .map(
                                   (group) => GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushNamed(context, RouteManager.groupTaskScreen, arguments: group.id);
+                                    onTap: () async {
+                                      await Navigator.pushNamed(context, RouteManager.groupTaskScreen, arguments: group.id);
+                                      loadGroup();
                                     },
                                     child: Container(
                                       decoration: BoxDecoration(

@@ -5,10 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 class UserController {
   static final String uuid = FirebaseAuth.instance.currentUser?.uid ?? "";
 
-  static Future<void> addData(String name, String des) async {
+  static Future<void> addData(String name) async {
     await FirebaseFirestore.instance
         .collection('users')
-        .add({"name": name, "description": des, "userID": uuid});
+        .add({"email": name, "userID": uuid});
   }
 
   static Future<List<UserModel>> getListData() async {

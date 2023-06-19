@@ -30,8 +30,7 @@ class GlobalData extends GetxController {
       todayTasks.clear();
 
       for (var doc in querySnapshot.docs) {
-        final date = DateTime.fromMicrosecondsSinceEpoch(
-            (doc.data()['dateDone'] as Timestamp).microsecondsSinceEpoch);
+        final date = DateTime.fromMicrosecondsSinceEpoch((doc.data()['dateDone'] as Timestamp).microsecondsSinceEpoch);
         if (compareDate(date, DateTime.now()) == -1 && doc.data()['isCompleted'] == false) {
           Map<String, dynamic> taskData = doc.data();
           taskData['id'] = doc.id; // Lấy ID của category
@@ -50,8 +49,9 @@ class GlobalData extends GetxController {
     }
   }
 
-  Future<void> addTaskToFirebase(String content, String description, String color, String priority,
-      Map<String, dynamic>? category, DateTime? dateDone, DateTime? dateStart) async {
+  Future<void> addTaskToFirebase(
+      String content, String description, String color, String priority, Map<String, dynamic>? category, DateTime? dateDone, DateTime? dateStart,
+      {String? idUser, String? idGroup}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('userId') ?? '';
     print(userId);
@@ -69,13 +69,14 @@ class GlobalData extends GetxController {
           'description': description,
           'color': color,
           'priority': priority,
-          'categoryID': category?["id"],
+          'categoryID': category?["id"] ?? "",
+          'groupID': idGroup,
           'isCompleted': false,
           'isFavorite': false,
           'dateDone': dateDone,
           'dateCreated': DateTime.now(),
           'dateStart': dateStart,
-          'userID': userId,
+          'userID': idUser ?? userId,
         };
 
         // Thêm dữ liệu vào document trong collection

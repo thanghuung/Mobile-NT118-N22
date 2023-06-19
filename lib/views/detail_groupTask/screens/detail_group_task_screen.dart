@@ -41,9 +41,10 @@ class DetailGroupTaskScreen extends StatelessWidget {
             ),
             actions: [
               IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, RouteManager.settingGroupTaskScreen,
+                onPressed: () async {
+                  await Navigator.pushNamed(context, RouteManager.settingGroupTaskScreen,
                       arguments: state.groupID);
+                  context.read<DetailGroupTaskBloc>().add(OnGetDataGroup());
                 },
                 icon: const Icon(
                   Icons.settings,

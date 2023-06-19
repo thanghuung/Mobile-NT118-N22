@@ -1,5 +1,6 @@
 import 'package:app/AppColors.dart';
 import 'package:app/constants/routes.dart';
+import 'package:app/fire_base/auth_controller.dart';
 import 'package:app/route_manager/route_manager.dart';
 import 'package:app/services/auth/firebase_auth_provider.dart';
 import 'package:app/views/register_view.dart';
@@ -84,8 +85,8 @@ class _WelcomeState extends State<Welcome> {
             Container(
               padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
               child: TextButton.icon(
-                onPressed: () {
-                  // Xử lý khi bấm nút "Đăng nhập với Google"
+                onPressed: () async {
+                  await AuthController.SignInWithGG();
                 },
                 icon: const Icon(
                   Icons.login,
