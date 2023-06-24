@@ -1,5 +1,6 @@
 import 'package:app/AppColors.dart';
 import 'package:app/component/AddTaskBottomSheet.dart';
+import 'package:app/views/countdown/count_down_timer.dart';
 import 'package:app/views/notes_view.dart';
 import 'package:app/views/noti_view.dart';
 import 'package:app/views/search_view.dart';
@@ -7,6 +8,8 @@ import 'package:app/views/setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+
+import 'countdown/TimeScreen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +25,7 @@ class _HomePageState extends State<HomePage> {
     const NoteView(),
     const SearchView(),
     const NotiView(),
+    const TimeScreen(),
     const SettingView(),
   ];
 
@@ -96,41 +100,16 @@ class _HomePageState extends State<HomePage> {
                   icon: Icons.notifications,
                 ),
                 GButton(
+                  icon: Icons.lock_clock,
+                ),
+                GButton(
                   icon: Icons.person_outline_sharp,
                 ),
+
               ],
             )),
       ),
     );
   }
 
-  Drawer _buildSidebar() {
-    return Drawer(
-      child: ListView(
-        children: [
-          UserAccountsDrawerHeader(
-            accountName: const Text('Oflutter.com'),
-            accountEmail: const Text('example@gmail.com'),
-            currentAccountPicture: CircleAvatar(
-              child: ClipOval(
-                child: Image.network(
-                  'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
-                  fit: BoxFit.cover,
-                  width: 90,
-                  height: 90,
-                ),
-              ),
-            ),
-            decoration: const BoxDecoration(
-              color: Colors.blue,
-              image: DecorationImage(
-                  fit: BoxFit.fill,
-                  image: NetworkImage(
-                      'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

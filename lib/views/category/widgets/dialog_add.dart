@@ -1,17 +1,28 @@
 import 'package:app/AppColors.dart';
 import 'package:app/fire_base/categories_controller.dart';
+import 'package:app/model/category_model.dart';
 import 'package:app/views/category/blocs/category_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DialogAddCategory extends StatelessWidget {
+class DialogAddCategory extends StatefulWidget {
+  final CategoryModel? categoryModel;
   final Function callback;
-  DialogAddCategory({Key? key,required this.callback}) : super(key: key);
+  DialogAddCategory({Key? key,required this.callback, this.categoryModel}) : super(key: key);
 
-  final TextEditingController _name = TextEditingController();
-  final TextEditingController _des = TextEditingController();
+  @override
+  State<DialogAddCategory> createState() => _DialogAddCategoryState();
+}
 
+class _DialogAddCategoryState extends State<DialogAddCategory> {
+  late final TextEditingController _name = TextEditingController(text: widget.categoryModel?.name?? "");
+  late final TextEditingController _des = TextEditingController(text: widget.categoryModel?.description?? "");
+
+  @override
+  void initState() {
+    super.initState();
+  }
   final GlobalKey<FormState> _keyForm = GlobalKey<FormState>();
 
   @override
@@ -61,15 +72,25 @@ class DialogAddCategory extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(onPressed: () async {
                   if(_keyForm.currentState?.validate() == true){
-                    EasyLoading.show();
-                    await CategoryController.addData(_name.text, _des.text);
-                    await callback();
-                    EasyLoading.dismiss();
-                    Navigator.pop(context);
+                    if(widget.categoryModel != null){
+                      EasyLoading.show();
+                      await CategoryController.editData(_name.text, _des.text, widget.categoryModel?.id ?? "");
+                      await widget.callback();
+                      EasyLoading.dismiss();
+                      Navigator.pop(context);
+                    }
+                    else{
+                      EasyLoading.show();
+                      await CategoryController.addData(_name.text, _des.text);
+                      await widget.callback();
+                      EasyLoading.dismiss();
+                      Navigator.pop(context);
+                    }
+
                   }
                 }, style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.pink
-                ), child: Text("Thêm"),),
+                ), child: widget.categoryModel == null? Text("Thêm"): Text("Cập nhật"),),
               )
             ],
           ),

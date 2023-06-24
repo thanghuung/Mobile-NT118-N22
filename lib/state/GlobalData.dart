@@ -51,7 +51,7 @@ class GlobalData extends GetxController {
 
   Future<void> addTaskToFirebase(
       String content, String description, String color, String priority, Map<String, dynamic>? category, DateTime? dateDone, DateTime? dateStart,
-      {String? idUser, String? idGroup}) async {
+      {String? idUser, String? idGroup, String? email}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('userId') ?? '';
     print(userId);
@@ -77,6 +77,7 @@ class GlobalData extends GetxController {
           'dateCreated': DateTime.now(),
           'dateStart': dateStart,
           'userID': idUser ?? userId,
+          'email': email,
         };
 
         // Thêm dữ liệu vào document trong collection

@@ -14,3 +14,7 @@ class OnGetDataGroup extends DetailGroupTaskEvent {
     this.spaceId,
   });
 }
+
+class OnClickOnlyMe extends DetailGroupTaskEvent {
+}
+

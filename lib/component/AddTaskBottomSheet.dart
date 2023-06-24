@@ -1,7 +1,9 @@
 import 'package:app/AppColors.dart';
 import 'package:app/common.dart';
 import 'package:app/component/FormGroup.dart';
+import 'package:app/model/category_model.dart';
 import 'package:app/state/GlobalData.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -9,7 +11,10 @@ import 'package:get/get.dart';
 enum TaskColor { pink, purple, blue, yellow }
 
 class AddTaskBottomSheet extends StatefulWidget {
-  const AddTaskBottomSheet({super.key});
+  final String? categoryName;
+  final String? categoryID;
+  final String? categoryDes;
+  const AddTaskBottomSheet({super.key, this.categoryName, this.categoryID, this.categoryDes});
   @override
   State<AddTaskBottomSheet> createState() => _AddTaskBottomSheetState();
 }
@@ -31,14 +36,17 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
     _content = TextEditingController();
     _description = TextEditingController();
     super.initState();
+    if(widget.categoryID != null ) {
+      selectedCategory = {"id": widget.categoryID};
+    }
     loadCategories();
   }
 
   Future<void> _selectDateEnd(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: selectedDateStart ?? DateTime.now(),
+      firstDate: selectedDateStart ?? DateTime.now(),
       lastDate: DateTime.now().add(Duration(days: 365)),
     );
 
@@ -52,9 +60,9 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   Future<void> _selectDateStart(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: selectedDateStart ?? DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(Duration(days: 365)),
+      lastDate: selectedDateEnd ?? DateTime.now().add(Duration(days: 365)),
     );
 
     if (picked != null && picked != selectedDateStart) {
@@ -259,21 +267,31 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                   }).toList(),
                 ),
               ),
-              DropdownButton<Map<String, dynamic>>(
-                hint: const Text("Chọn thể loại"),
-                value: selectedCategory, // Giá trị category được chọn
-                onChanged: (Map<String, dynamic>? newValue) {
-                  setState(() {
-                    selectedCategory = newValue;
-                  });
-                },
-                items: categories.map<DropdownMenuItem<Map<String, dynamic>>>((category) {
-                  return DropdownMenuItem<Map<String, dynamic>>(
-                    value: category,
-                    child: Text(category['name'] ?? ""),
-                  );
-                }).toList(),
-              ),
+              if (widget.categoryName == null)
+                DropdownButton<Map<String, dynamic>>(
+                  hint: const Text("Chọn thể loại"),
+                  value: selectedCategory, // Giá trị category được chọn
+                  onChanged: (Map<String, dynamic>? newValue) {
+                    setState(() {
+                      selectedCategory = newValue;
+                    });
+                  },
+                  items: categories.map<DropdownMenuItem<Map<String, dynamic>>>((category) {
+                    return DropdownMenuItem<Map<String, dynamic>>(
+                      value: category,
+                      child: Text(category['name'] ?? ""),
+                    );
+                  }).toList(),
+                ),
+              if (widget.categoryName != null)
+                Column(
+                  children: [
+                    SizedBox(
+                      height: 16,
+                    ),
+                    Text(widget.categoryName.toString()),
+                  ],
+                ),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,

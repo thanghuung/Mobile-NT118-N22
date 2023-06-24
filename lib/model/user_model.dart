@@ -18,4 +18,10 @@ class UserModel {
     data['id'] = this.id;
     return data;
   }
+
+  @override
+  String toString() {
+    // TODO: implement toString
+    return this.email ?? "";
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:app/views/category/category_screen.dart';
+import 'package:app/views/countdown/count_down_timer.dart';
 import 'package:app/views/detail_groupTask/blocs/detail_group_task_bloc.dart';
 import 'package:app/views/detail_groupTask/screens/detail_group_task_setting_screen.dart';
 import 'package:app/views/detail_task/screens/detail_task_screen.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../views/category/blocs/category_cubit.dart';
 import '../views/detail_groupTask/screens/detail_group_task_screen.dart';
 import '../views/detail_task/blocs/detail_task_bloc.dart';
+import '../views/detail_task/screens/detail_task_setting.dart';
 import '../views/home_view.dart';
 import '../views/login_view.dart';
 import '../views/register_view.dart';
@@ -25,15 +27,26 @@ class RouteManager {
   static const String detailTaskScreen = "/detailTaskScreen";
   static const String groupTaskScreen = "/detailGroupTaskScreen";
   static const String settingGroupTaskScreen = "/settingGroupTaskScreen";
+  static const String time = "/time";
+  static const String settingDetailTask = "/settingDetailTask";
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case settingDetailTask:
+        return MaterialPageRoute(builder: (_) {
+          final string = settings.arguments as String?;
+          return DetailTaskSetting(
+            categoryID: string??"",
+          );
+        });
       case loginRoute:
         return MaterialPageRoute(builder: (_) => const LoginView());
       case settingGroupTaskScreen:
         return MaterialPageRoute(builder: (_) {
           final string = settings.arguments as String?;
-          return DetailGroupTaskSettingScreen(groupID: string??"",);
+          return DetailGroupTaskSettingScreen(
+            groupID: string ?? "",
+          );
         });
       case welcomeRoute:
         return MaterialPageRoute(builder: (_) => const Welcome());

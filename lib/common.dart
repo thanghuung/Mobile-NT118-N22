@@ -86,7 +86,7 @@ Future<List<Map<String, dynamic>>> getAllCategories() async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('categories')
-          // .where('userID', isEqualTo: userId)
+          .where('userID', isEqualTo: userId)
           .get();
 
       querySnapshot.docs.forEach((doc) {

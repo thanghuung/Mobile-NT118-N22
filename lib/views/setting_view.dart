@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
+import '../services/auth/auth_service.dart';
+
 class SettingView extends StatefulWidget {
   const SettingView({super.key});
 
@@ -122,96 +124,34 @@ class _SettingViewState extends State<SettingView> {
                   ),
                 ),
                 IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, settingPageRoute);
-                      // Xử lý khi nhấn nút cài đặt
-                      // Chuyển đến màn hình cài đặt người dùng
+                    onPressed: () async {
+                      showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                                title: Text("Thông báo"),
+                                content: Text("Bạn chắc chắn muốn đăng xuất"),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () async {
+                                        await AuthService.firebase().logOut();
+                                        Navigator.of(context).pushNamedAndRemoveUntil(
+                                          loginRoute,
+                                          (_) => false,
+                                        );
+                                      },
+                                      child: Text("OK"))
+                                ],
+                              ));
                     },
                     hoverColor: Colors.transparent,
                     splashColor: Colors.transparent,
                     icon: const Icon(
-                      Icons.settings,
+                      Icons.exit_to_app,
                     )),
               ],
             ),
             const SizedBox(
               height: 30,
-            ),
-            Column(
-              children: [
-                TextButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      // border:
-                      foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
-                      minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.calendar_today,
-                          color: AppColors.blue,
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "Hôm nay",
-                          style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                        )
-                      ],
-                    )),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      // border:
-                      foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
-                      minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.check,
-                          color: AppColors.purple,
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "Hoàn thành",
-                          style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                        )
-                      ],
-                    )),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      // border:
-                      foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
-                      minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.favorite,
-                          color: AppColors.pink,
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "Yêu thích",
-                          style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                        )
-                      ],
-                    ))
-              ],
             ),
             const Divider(),
             TextButton(
@@ -284,7 +224,9 @@ class _SettingViewState extends State<SettingView> {
                                 .map(
                                   (group) => GestureDetector(
                                     onTap: () async {
-                                      await Navigator.pushNamed(context, RouteManager.groupTaskScreen, arguments: group.id);
+                                      await Navigator.pushNamed(
+                                          context, RouteManager.groupTaskScreen,
+                                          arguments: group.id);
                                       loadGroup();
                                     },
                                     child: Container(

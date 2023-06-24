@@ -25,9 +25,15 @@ class _AddGroupBottomSheetState extends State<AddGroupBottomSheet> {
   late final TextEditingController _content;
   late final TextEditingController _description;
   final _formKey = GlobalKey<FormState>();
-  List<UserModel> listData = [];
   List<UserModel> listDataSelect = [];
+  List<UserModel> listData = [];
   UserModel? itemSelect;
+  Future<void> getListUserName() async {
+    listData = await UserController.getListData();
+    setState(() {
+      _key = GlobalKey<AutoCompleteTextFieldState<UserModel>>();
+    });
+  }
 
   @override
   void initState() {
@@ -37,10 +43,8 @@ class _AddGroupBottomSheetState extends State<AddGroupBottomSheet> {
     getListUserName();
   }
 
-  Future<void> getListUserName() async {
-    listData = await UserController.getListData();
-    setState(() {});
-  }
+  GlobalKey<AutoCompleteTextFieldState<UserModel>> _key =
+      GlobalKey<AutoCompleteTextFieldState<UserModel>>();
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +111,7 @@ class _AddGroupBottomSheetState extends State<AddGroupBottomSheet> {
                       Expanded(
                         child: AutoCompleteTextField<UserModel>(
                           controller: TextEditingController(text: itemSelect?.email),
-                          key: GlobalKey(),
+                          key: _key,
                           suggestions: listData
                               .where((element) =>
                                   (listDataSelect.every((e) => (e.id != element.id)) &&
@@ -140,6 +144,7 @@ class _AddGroupBottomSheetState extends State<AddGroupBottomSheet> {
                                       listDataSelect.add(itemSelect!);
                                       setState(() {
                                         itemSelect = null;
+                                        _key = GlobalKey<AutoCompleteTextFieldState<UserModel>>();
                                       });
                                     }
                                   : null,
@@ -175,6 +180,9 @@ class _AddGroupBottomSheetState extends State<AddGroupBottomSheet> {
                                     onPressed: () {
                                       setState(() {
                                         listDataSelect.remove(e);
+                                        setState(() {
+                                          _key = GlobalKey<AutoCompleteTextFieldState<UserModel>>();
+                                        });
                                       });
                                     },
                                     icon: const Icon(

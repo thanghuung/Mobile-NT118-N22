@@ -3,12 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserController {
-  static final String uuid = FirebaseAuth.instance.currentUser?.uid ?? "";
 
   static Future<void> addData(String name) async {
     await FirebaseFirestore.instance
         .collection('users')
-        .add({"email": name, "userID": uuid});
+        .add({"email": name, "userID": FirebaseAuth.instance.currentUser?.uid ?? ""});
   }
 
   static Future<List<UserModel>> getListData() async {

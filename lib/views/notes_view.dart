@@ -26,11 +26,12 @@ class _NoteViewState extends State<NoteView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         leadingWidth: 0,
-        title: const Text("Hôm nay", style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+        leading: const SizedBox.shrink(),
+        title: const Text("Todos", style: TextStyle(color: Colors.white)),
+        backgroundColor: AppColors.pink,
+        centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 3,
       ),
@@ -73,11 +74,11 @@ class _NoteViewState extends State<NoteView> {
                               return NoteComponent(
                                 id: task["id"],
                                 dateStart: task["dateStart"],
-                                content: task["content"]??"",
-                                description: task["description"]??"",
-                                isCompleted: task["isCompleted"]??false,
-                                category: task["categoryID"]??"",
-                                date: task["dateDone"]??"",
+                                content: task["content"] ?? "",
+                                description: task["description"] ?? "",
+                                isCompleted: task["isCompleted"] ?? false,
+                                category: task["categoryID"] ?? "",
+                                date: task["dateDone"] ?? "",
                                 backgroundColor: backgroundToColor(task["color"]),
                                 priority: priorityToColor(task["priority"]),
                               );
@@ -86,7 +87,6 @@ class _NoteViewState extends State<NoteView> {
                         ],
                       );
                     }
-
                     if (controller.todayTasks.length == 1 &&
                         controller.todayTasks[0]['loading'] == true) {
                       todayView = const Center(
@@ -104,13 +104,13 @@ class _NoteViewState extends State<NoteView> {
                             (index) {
                               final task = controller.todayTasks[index] ?? {};
                               return NoteComponent(
-                                id: task["id"]??"",
-                                content: task["content"]??"",
+                                id: task["id"] ?? "",
+                                content: task["content"] ?? "",
                                 dateStart: task["dateStart"],
-                                description: task["description"]??"",
+                                description: task["description"] ?? "",
                                 isCompleted: task["isCompleted"],
-                                category: task["categoryID"]??"",
-                                date: task["dateDone"]??"",
+                                category: task["categoryID"] ?? "",
+                                date: task["dateDone"] ?? "",
                                 backgroundColor: backgroundToColor(task["color"]),
                                 priority: priorityToColor(task["priority"]),
                               );
@@ -121,86 +121,73 @@ class _NoteViewState extends State<NoteView> {
                     }
                     return Column(
                       children: [
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          const Text(
-                            "Trễ hạn",
-                            style: AppFontText.title,
-                          ),
-                          TextButton(
-                            child: Text("Đặt lại",
-                                style: AppFontText.title.copyWith(color: AppColors.pink)),
-                            onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return SingleChildScrollView(
-                                    padding: EdgeInsets.all(16),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Text(
-                                          'Đặt lại công việc trễ hạn',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        // SizedBox(height: 16),
-                                        CalendarDatePicker(
-                                          initialDate: DateTime.now(),
-                                          firstDate: DateTime.now(),
-                                          lastDate: DateTime(2100),
-                                          onDateChanged: (DateTime? selectedDate) {
-                                            // Xử lý khi ngày được chọn
-                                          },
-                                        ),
-                                        // SizedBox(height: 16),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            // Xử lý khi nhấn nút "Đặt"
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: AppColors.pink, // Màu nền của nút
-                                            padding:
-                                                const EdgeInsets.all(4), // Padding xung quanh nút
-                                          ),
-                                          child: const Text(
-                                            'Đặt',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ]),
-                        const SizedBox(
-                          height: 14,
+                        SizedBox(
+                          height: 16,
                         ),
-                        upcomingView,
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Hôm nay - ${DateTime.now().day} tháng ${DateTime.now().month}, ${DateTime.now().year}",
-                              style: AppFontText.title,
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Trễ hạn",
+                                  textAlign: TextAlign.start,
+                                  style: AppFontText.title,
+                                ),
+                                const SizedBox(
+                                  height: 14,
+                                ),
+                                upcomingView,
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                             ),
                           ),
                         ),
                         const SizedBox(
-                          height: 14,
+                          height: 16,
                         ),
-                        todayView,
-                        OutlinedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, RouteManager.detailTaskScreen);
-                          },
-                          child: const Text(
-                            "Xem tất cả",
-                            style: TextStyle(color: AppColors.pink),
+                        Card(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "Hôm nay - ${DateTime.now().day} tháng ${DateTime.now().month}, ${DateTime.now().year}",
+                                      style: AppFontText.title,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 14,
+                                ),
+                                todayView,
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: 40,
+                          child: ElevatedButton(
+
+                            onPressed: () {
+                              Navigator.pushNamed(context, RouteManager.detailTaskScreen);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.pink,
+                            ),
+                            child: Text(
+                              "Xem tất cả".toUpperCase(),
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                         ),
                       ],

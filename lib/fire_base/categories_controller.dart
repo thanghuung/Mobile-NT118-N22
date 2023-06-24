@@ -4,22 +4,29 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../model/category_model.dart';
 
 class CategoryController {
-  static final String uuid = FirebaseAuth.instance.currentUser?.uid ?? "";
-
   static Future<void> addData(String name, String des) async {
-    await FirebaseFirestore.instance
-        .collection('categories')
-        .add({"name": name, "description": des, "userID": uuid});
+    await FirebaseFirestore.instance.collection('categories').add(
+        {"name": name, "description": des, "userID": FirebaseAuth.instance.currentUser?.uid ?? ""});
+  }
+
+  static Future<void> editData(String name, String des, String id) async {
+    final doc = FirebaseFirestore.instance.collection('categories').doc(id);
+    doc.update({
+      "name": name,
+      "description": des,
+    });
   }
 
   static Future<List<CategoryModel>> getListData() async {
     var categoryTable = await FirebaseFirestore.instance
         .collection('categories')
-        .where('userID', isEqualTo: uuid)
+        .where('userID', isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? "")
         .get();
 
-    var taskTable =
-        await FirebaseFirestore.instance.collection('tasks').where('userID', isEqualTo: uuid).get();
+    var taskTable = await FirebaseFirestore.instance
+        .collection('tasks')
+        .where('userID', isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? "")
+        .get();
 
     return categoryTable.docs.map((e) {
       int count = 0;

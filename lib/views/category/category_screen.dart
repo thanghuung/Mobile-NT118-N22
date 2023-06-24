@@ -27,9 +27,10 @@ class CategoryScreen extends StatelessWidget {
                   ...List.generate(
                     state.listData.length,
                     (index) => GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, RouteManager.detailTaskScreen,
+                      onTap: () async {
+                        await Navigator.pushNamed(context, RouteManager.detailTaskScreen,
                             arguments: state.listData[index].id);
+                        context.read<CategoryCubit>().getData();
                       },
                       child: CategoryItem(
                         title: state.listData[index].name ?? "",

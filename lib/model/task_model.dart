@@ -14,6 +14,7 @@ class TaskModel {
   bool? isFavorite;
   String? priority;
   String? userID;
+  String? email;
 
   TaskModel(
       {this.id,
@@ -28,6 +29,7 @@ class TaskModel {
       required this.isCompleted,
       this.isFavorite,
       this.priority,
+      this.email,
       this.userID});
 
   TaskModel.fromJson(Map<String, dynamic> json) {
@@ -47,6 +49,7 @@ class TaskModel {
     priority = json['priority'];
     userID = json['userID'];
     groupID = json['groupID'];
+    email = json['email'];
   }
 
   Map<String, dynamic> toJson() {
@@ -64,6 +67,7 @@ class TaskModel {
     data['priority'] = this.priority;
     data['userID'] = this.userID;
     data['groupID'] = this.groupID;
+    data['email'] = this.email;
     return data;
   }
 }

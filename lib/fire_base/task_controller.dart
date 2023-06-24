@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class TaskController {
-  static final String uuid = FirebaseAuth.instance.currentUser?.uid ?? "";
 
   static Future<void> addTask(TaskModel taskModel) async {
     await FirebaseFirestore.instance.collection('tasks').add(taskModel.toJson());
@@ -26,14 +25,35 @@ class TaskController {
     EasyLoading.dismiss();
   }
 
+  static Future<void> assign(String id, String uuid, String email) async {
+    final a = FirebaseFirestore.instance.collection('tasks').doc(id);
+    EasyLoading.show();
+
+    await a.update({'userID': uuid, 'email': email});
+    EasyLoading.dismiss();
+  }
+
   static Future<List<TaskModel>> getListData(TaskParam param,
-      {String? category, String? groupId}) async {
+      {String? category, String? groupId, bool? onlyMe}) async {
     late List<TaskModel> listData;
     if (groupId == null) {
       listData = await FirebaseFirestore.instance
           .collection('tasks')
-          .where('userID', isEqualTo: uuid)
+          .where('userID', isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? "")
           .where("categoryID", isEqualTo: category)
+          .get()
+          .then((value) => value.docs.map(
+                (e) {
+                  final data = TaskModel.fromJson(e.data());
+                  data.id = e.id;
+                  return data;
+                },
+              ).toList());
+    } else if (onlyMe == true) {
+      listData = await FirebaseFirestore.instance
+          .collection('tasks')
+          .where("groupID", isEqualTo: groupId)
+          .where('userID', isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? "")
           .get()
           .then((value) => value.docs.map(
                 (e) {

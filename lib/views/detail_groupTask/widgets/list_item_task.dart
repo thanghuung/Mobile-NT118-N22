@@ -1,7 +1,5 @@
-import 'package:app/component/NoteComponent.dart';
-import 'package:app/views/detail_task/blocs/detail_task_bloc.dart';
+import 'package:app/component/NoteComponentGroupTask.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import '../../../common.dart';
@@ -22,10 +20,13 @@ class ListItemGroupTask extends StatelessWidget {
               height: 16,
             ),
             ...listData
-                .map((e) => NoteComponent(
+                .map((e) => NoteComponentGroupTask(
                       id: e.id ?? "s",
                       content: e.content ?? "",
-                      description: e.description ?? "",
+                      userId: e.userID ?? "",
+                      userEmail: e.email ?? "",
+                      groupID: e.groupID??"",
+                      description:e.description ?? "",
                       isCompleted: e.isCompleted ?? false,
                       category: e.categoryID ?? "",
                       backgroundColor: backgroundToColor(e.color ?? ""),

@@ -5,19 +5,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-class GroupController {
-  static final String uuid = FirebaseAuth.instance.currentUser?.uid ?? "";
+import '../model/user_group_model.dart';
 
+class GroupController {
   static Future<GroupModel> addGroup(GroupModel taskModel) async {
     final group = GroupModel(
       des: taskModel.des,
       name: taskModel.name,
-      isHost: uuid,
+      isHost: FirebaseAuth.instance.currentUser?.uid ?? "",
     );
     final data = await FirebaseFirestore.instance.collection("group").add(group.toJson());
     await FirebaseFirestore.instance
         .collection("userGroup")
-        .add({"groupID": data.id, "userID": uuid});
+        .add({"groupID": data.id, "userID": FirebaseAuth.instance.currentUser?.uid ?? ""});
     for (int i = 0; i < (taskModel.userModels ?? []).length; i++) {
       await FirebaseFirestore.instance
           .collection("userGroup")
@@ -29,9 +29,13 @@ class GroupController {
   }
 
   static Future<List<GroupModel>> getGroups() async {
-    final data =
-        await FirebaseFirestore.instance.collection("group").where("isHost", isEqualTo: uuid).get();
-    final list = data.docs.map((e) {
+    final data = await FirebaseFirestore.instance.collection("group").get();
+    final listDataGroup = await FirebaseFirestore.instance
+        .collection("userGroup")
+        .where("userID", isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+        .get();
+    final listGroup = listDataGroup.docs.map((e) => UserGroupModel.fromJson(e.data())).toList();
+    List<GroupModel> list = data.docs.map((e) {
       final daya = GroupModel.fromJson(e.data());
       daya.id = e.id;
       return daya;
@@ -41,9 +45,9 @@ class GroupController {
           .collection("userGroup")
           .where("groupID", isEqualTo: list[i].id)
           .get();
-      print(list[i].id);
       list[i].numUser = dt.size;
     }
+    list = list.where((element) =>  listGroup.any((el) => el.groupID == element.id)).toList();
     return list;
   }
 
@@ -59,7 +63,7 @@ class GroupController {
   static Future<List<TaskModel>> getListData(TaskParam param, {String? category}) async {
     final listData = await FirebaseFirestore.instance
         .collection('tasks')
-        .where('userID', isEqualTo: uuid)
+        .where('userID', isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? "")
         .where("categoryID", isEqualTo: category)
         .get()
         .then((value) => value.docs.map((e) {

@@ -51,6 +51,7 @@ class _AddTaskGroupState extends State<AddTaskGroup> {
   TaskColor selectedColor = TaskColor.pink;
   Map<String, dynamic>? selectedCategory;
   UserModel? itemSelect;
+  final GlobalKey<AutoCompleteTextFieldState<UserModel>> _key =  GlobalKey<AutoCompleteTextFieldState<UserModel>>();
 
   @override
   void initState() {
@@ -102,7 +103,8 @@ class _AddTaskGroupState extends State<AddTaskGroup> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
+      decoration: const BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
       padding: const EdgeInsets.all(16),
       child: Form(
           key: _formKey,
@@ -125,15 +127,22 @@ class _AddTaskGroupState extends State<AddTaskGroup> {
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
               ),
               AutoCompleteTextField<UserModel>(
-                controller: TextEditingController(text: itemSelect?.email),
-                key: GlobalKey<AutoCompleteTextFieldState<UserModel>>(),
-                autofocus: false,
-                suggestions: (widget.userModel).where((element) => ([itemSelect].every((e) => (e?.id != element.id)))).toList(),
-                clearOnSubmit: true,
-                itemFilter: (item, query) => item.email?.toLowerCase().startsWith(query.toLowerCase()) ?? true,
+                key: _key,
+                suggestions: (widget.userModel)
+                    .where((element) => ([itemSelect].every((e) => (e?.id != element.id))))
+                    .toList(),
+                clearOnSubmit: false,
+                textSubmitted: (_String){
+                  print(_String);
+                },
+                itemFilter: (item, query) =>
+                    item.email?.toLowerCase().startsWith(query.toLowerCase()) ?? true,
                 itemSorter: (a, b) => 1,
                 itemSubmitted: (item) => setState(() {
                   itemSelect = item;
+                  setState(() {
+
+                  });
                 }),
                 itemBuilder: (context, item) => ListTile(
                   title: Text(item.email ?? ""),
@@ -180,7 +189,9 @@ class _AddTaskGroupState extends State<AddTaskGroup> {
                     onPressed: () => _selectDateStart(context),
                     icon: Icon(Icons.calendar_today), // Biểu tượng (icon)
                     label: Text(
-                      selectedDateStart == null ? 'Chọn ngày bắt đầu' : formatDate(selectedDateStart!),
+                      selectedDateStart == null
+                          ? 'Chọn ngày bắt đầu'
+                          : formatDate(selectedDateStart!),
                     ), // Chữ
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white, // Màu nền của button
@@ -331,9 +342,9 @@ class _AddTaskGroupState extends State<AddTaskGroup> {
                     }
                     EasyLoading.show();
                     String color = selectedColor.toString().split('.').last;
-                    await dataController.addTaskToFirebase(
-                        _content.text, _description.text, color, selectedPriority, selectedCategory, selectedDateEnd, selectedDateStart,
-                        idUser: itemSelect?.id, idGroup: widget.idGroup);
+                    await dataController.addTaskToFirebase(_content.text, _description.text, color,
+                        selectedPriority, selectedCategory, selectedDateEnd, selectedDateStart,
+                        idUser: itemSelect?.id, idGroup: widget.idGroup, email: itemSelect?.email);
                     EasyLoading.dismiss();
                     Navigator.of(context).pop(); // Đóng bottom sheet sau khi tạo task
                   },
