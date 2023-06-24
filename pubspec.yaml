@@ -47,6 +47,7 @@ dependencies:
   intl: ^0.17.0
   get: ^4.6.5
   autocomplete_textfield: ^2.0.1
+  flutter_timer_countdown: ^1.0.5
 dev_dependencies:
   flutter_test:
     sdk: flutter
