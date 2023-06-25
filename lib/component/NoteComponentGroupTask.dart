@@ -426,15 +426,15 @@ class _DialogDetailTaskState extends State<DialogDetailTask> {
               ),
             ), // Chữ
             if (!widget.isCompeted)
-              IconButton(onPressed: () => _selectDateEnd(context), icon: Icon(Icons.edit))
+              IconButton(onPressed: () => _selectDateEnd(context), icon: const Icon(Icons.edit))
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 16,
         ),
         Row(
           children: [
-            Text(
+            const Text(
               "Trạng thái: ",
               style: TextStyle(fontWeight: FontWeight.w200),
             ),

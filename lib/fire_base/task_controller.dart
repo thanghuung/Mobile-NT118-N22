@@ -25,6 +25,15 @@ class TaskController {
     EasyLoading.dismiss();
   }
 
+  static Future<void> updateInfoTask(
+      String id, String name, String des) async {
+    final a = FirebaseFirestore.instance.collection('tasks').doc(id);
+    EasyLoading.show();
+
+    await a.update({'content': name, 'description': des});
+    EasyLoading.dismiss();
+  }
+
   static Future<void> assign(String id, String uuid, String email) async {
     final a = FirebaseFirestore.instance.collection('tasks').doc(id);
     EasyLoading.show();

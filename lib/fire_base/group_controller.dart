@@ -8,6 +8,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import '../model/user_group_model.dart';
 
 class GroupController {
+
   static Future<GroupModel> addGroup(GroupModel taskModel) async {
     final group = GroupModel(
       des: taskModel.des,
@@ -57,6 +58,15 @@ class GroupController {
     EasyLoading.show();
 
     await a.update({'dateDone': dateEnd, 'dateStart': dateStart, 'isCompleted': isCompleted});
+    EasyLoading.dismiss();
+  }
+
+  static Future<void> updateInfoGroup(
+      String id, String name, String des) async {
+    final a = FirebaseFirestore.instance.collection('group').doc(id);
+    EasyLoading.show();
+
+    await a.update({'des': des, 'name': name, });
     EasyLoading.dismiss();
   }
 

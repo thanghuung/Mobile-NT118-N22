@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class DialogAddCategory extends StatefulWidget {
   final CategoryModel? categoryModel;
   final Function callback;
-  DialogAddCategory({Key? key,required this.callback, this.categoryModel}) : super(key: key);
+  const DialogAddCategory({Key? key,required this.callback, this.categoryModel}) : super(key: key);
 
   @override
   State<DialogAddCategory> createState() => _DialogAddCategoryState();

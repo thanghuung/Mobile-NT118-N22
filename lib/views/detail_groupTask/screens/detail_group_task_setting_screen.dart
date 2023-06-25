@@ -8,6 +8,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import '../../../component/addTaskGroup.dart';
 import '../../../model/group_model.dart';
+import '../widgets/dialog_edit.dart';
 
 class DetailGroupTaskSettingScreen extends StatefulWidget {
   final String groupID;
@@ -131,34 +132,54 @@ class _DetailGroupTaskSettingScreenState extends State<DetailGroupTaskSettingScr
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Column(
+                  child: Row(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Tên".toUpperCase(),
-                            style: TextStyle(fontWeight: FontWeight.w500),
-                          ),
-                          Expanded(child: Center(child: Text(group?.name ?? ""))),
-                        ],
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Tên".toUpperCase(),
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                Expanded(child: Center(child: Text(group?.name ?? ""))),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Mô tả".toUpperCase(),
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                Expanded(child: Center(child: Text(group?.des ?? ""))),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Mô tả".toUpperCase(),
-                            style: TextStyle(fontWeight: FontWeight.w500),
-                          ),
-                          Expanded(child: Center(child: Text(group?.des ?? ""))),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
+                      if (group?.isHost == FirebaseAuth.instance.currentUser?.uid)
+                        IconButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) => DialogEdit(
+                                      groupModel: group,
+                                      callback: () {
+                                        getData();
+                                      },
+                                    ));
+                          },
+                          icon: const Icon(Icons.edit),
+                        )
                     ],
                   ),
                 ),
@@ -210,7 +231,11 @@ class _DetailGroupTaskSettingScreenState extends State<DetailGroupTaskSettingScr
                                           height: 20,
                                           child: IconButton(
                                               padding: EdgeInsets.zero,
-                                              onPressed: (group?.isHost != e.id && e.id != FirebaseAuth.instance.currentUser?.uid && group?.isHost == FirebaseAuth.instance.currentUser?.uid)
+                                              onPressed: (group?.isHost != e.id &&
+                                                      e.id !=
+                                                          FirebaseAuth.instance.currentUser?.uid &&
+                                                      group?.isHost ==
+                                                          FirebaseAuth.instance.currentUser?.uid)
                                                   ? () {
                                                       setState(() async {
                                                         EasyLoading.show();
@@ -231,10 +256,13 @@ class _DetailGroupTaskSettingScreenState extends State<DetailGroupTaskSettingScr
                                                           color: AppColors.pink),
                                                     )
                                                   : (e.id != FirebaseAuth.instance.currentUser?.uid
-                                                      ? (group?.isHost == FirebaseAuth.instance.currentUser?.uid? const Icon(
-                                                          Icons.close,
-                                                          size: 20,
-                                                        ): const SizedBox.shrink() )
+                                                      ? (group?.isHost ==
+                                                              FirebaseAuth.instance.currentUser?.uid
+                                                          ? const Icon(
+                                                              Icons.close,
+                                                              size: 20,
+                                                            )
+                                                          : const SizedBox.shrink())
                                                       : const Text(
                                                           "me",
                                                           style: TextStyle(
@@ -332,36 +360,37 @@ class _DetailGroupTaskSettingScreenState extends State<DetailGroupTaskSettingScr
               const SizedBox(
                 height: 16,
               ),
-              SizedBox(
-                width: double.infinity,
-                height: 40,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      builder: (_) => AlertDialog(
-                        title: const Text("Thông báo"),
-                        content: const Text("Bạn có chắc chắn xóa?"),
-                        actions: [
-                          TextButton(
-                              onPressed: () async {
-                                await deleteGroup();
-                                Navigator.pop(context);
-                              },
-                              child: Text("OK")),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text("HỦY")),
-                        ],
-                      ),
-                    );
-                  },
-                  child: Text("Xóa Group"),
-                ),
-              )
+              if (group?.isHost == FirebaseAuth.instance.currentUser?.uid)
+                SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text("Thông báo"),
+                          content: const Text("Bạn có chắc chắn xóa?"),
+                          actions: [
+                            TextButton(
+                                onPressed: () async {
+                                  await deleteGroup();
+                                  Navigator.pop(context);
+                                },
+                                child: Text("OK")),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("HỦY")),
+                          ],
+                        ),
+                      );
+                    },
+                    child: Text("Xóa Group"),
+                  ),
+                )
             ],
           ),
         ),

@@ -1,9 +1,11 @@
 import 'package:app/AppColors.dart';
 import 'package:app/common.dart';
+import 'package:app/component/dialogEditInfoTask.dart';
 import 'package:app/fire_base/task_controller.dart';
 import 'package:app/model/task_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 
 class NoteComponent extends StatefulWidget {
   final String id;
@@ -72,8 +74,8 @@ class _NoteComponentState extends State<NoteComponent> {
                     DialogDetailTask(
                       id: widget.id,
                       dateStart: taskModel?.dateStart ?? DateTime.now(),
-                      content: widget.description,
-                      des: widget.description,
+                      content: taskModel?.content ?? widget.content,
+                      des: taskModel?.description ?? widget.description,
                       dateEnd: taskModel?.dateDone ?? DateTime.now(),
                       isCompeted: taskModel?.isCompleted ?? false,
                       onCallBack: refreshData,
@@ -101,7 +103,7 @@ class _NoteComponentState extends State<NoteComponent> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.content,
+                      taskModel?.content?? widget.content,
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -114,7 +116,7 @@ class _NoteComponentState extends State<NoteComponent> {
                       height: 8,
                     ),
                     Text(
-                      widget.description,
+                      taskModel?.description?? widget.description,
                       style: TextStyle(
                           color: Colors.grey.shade500, fontSize: 14, fontWeight: FontWeight.w400),
                     ),
@@ -254,11 +256,33 @@ class _DialogDetailTaskState extends State<DialogDetailTask> {
               widget.des,
               textAlign: TextAlign.center,
             )),
+            if (widget.isCompeted != true)
+              IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: Colors.transparent,
+                      actions: [
+                        DialogEditInfoTask(
+                            callback: () {
+                              Navigator.pop(context);
+                              widget.onCallBack();
+                            }, name: widget.content, des: widget.des, id: widget.id)
+                      ],
+                    ),
+                  );
+                },
+                icon: Icon(
+                  Icons.edit,
+                  size: 20,
+                ))
           ],
         ),
-        const SizedBox(
-          height: 16,
-        ),
+        if (widget.isCompeted == true)
+          SizedBox(
+            height: 16,
+          ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -266,17 +290,23 @@ class _DialogDetailTaskState extends State<DialogDetailTask> {
             const Text("Bắt đầu: ", style: TextStyle(fontWeight: FontWeight.w200)),
             Expanded(
               child: Text(
-                  selectedDateStart == null ? 'Ngày bắt đầu' : formatDate(selectedDateStart!),
+                selectedDateStart == null ? 'Ngày bắt đầu' : formatDate(selectedDateStart!),
                 textAlign: TextAlign.center,
               ),
             ),
-            if(widget.isCompeted != true)
-            IconButton(onPressed: () => _selectDateStart(context), icon: const Icon(Icons.edit, size: 20,))
+            if (widget.isCompeted != true)
+              IconButton(
+                  onPressed: () => _selectDateStart(context),
+                  icon: const Icon(
+                    Icons.edit,
+                    size: 20,
+                  ))
           ],
         ),
-        const SizedBox(
-          height: 16,
-        ),
+        if (widget.isCompeted == true)
+          SizedBox(
+            height: 16,
+          ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -287,8 +317,13 @@ class _DialogDetailTaskState extends State<DialogDetailTask> {
                 textAlign: TextAlign.center,
               ),
             ),
-            if(widget.isCompeted != true)
-            IconButton(onPressed: () => _selectDateEnd(context), icon: const Icon(Icons.edit, size: 20,))
+            if (widget.isCompeted != true)
+              IconButton(
+                  onPressed: () => _selectDateEnd(context),
+                  icon: const Icon(
+                    Icons.edit,
+                    size: 20,
+                  ))
           ],
         ),
         SizedBox(
@@ -332,14 +367,32 @@ class _DialogDetailTaskState extends State<DialogDetailTask> {
             ElevatedButton(
               onPressed: (!widget.isCompeted)
                   ? () async {
-                      await TaskController.updateTask(
-                        widget.id,
-                        widget.dateStart,
-                        widget.dateEnd,
-                        true,
-                      );
-                      Navigator.pop(context);
-                      widget.onCallBack();
+                      showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                                title: Text("Thông báo"),
+                                content: Text("Bạn chắc chắn đã hoàn thành?"),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Hủy")),
+                                  TextButton(
+                                      onPressed: () async {
+                                        await TaskController.updateTask(
+                                          widget.id,
+                                          widget.dateStart,
+                                          widget.dateEnd,
+                                          true,
+                                        );
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        widget.onCallBack();
+                                      },
+                                      child: Text("OK"))
+                                ],
+                              ));
                     }
                   : null,
               child: const Text("Hoàn thành"),
