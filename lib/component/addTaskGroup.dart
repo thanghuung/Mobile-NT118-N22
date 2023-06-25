@@ -7,11 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
+import '../fire_base/notifier_controller.dart';
+import '../model/notifier_model.dart';
 import '../model/user_model.dart';
 
 enum TaskColor { pink, purple, blue, yellow }
 
-void showAddTaskGroupBottomSheet(BuildContext context, List<UserModel> list, String idGroup) {
+void showAddTaskGroupBottomSheet(
+    BuildContext context, List<UserModel> list, String idGroup, String nameGroup) {
   showModalBottomSheet(
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
@@ -25,6 +28,7 @@ void showAddTaskGroupBottomSheet(BuildContext context, List<UserModel> list, Str
                 child: AddTaskGroup(
               userModel: list,
               idGroup: idGroup,
+              nameGroup: nameGroup,
             ))),
       );
     },
@@ -34,7 +38,8 @@ void showAddTaskGroupBottomSheet(BuildContext context, List<UserModel> list, Str
 class AddTaskGroup extends StatefulWidget {
   final List<UserModel> userModel;
   final String idGroup;
-  const AddTaskGroup({super.key, required this.userModel, required this.idGroup});
+  final String? nameGroup;
+  const AddTaskGroup({super.key, required this.userModel, required this.idGroup, this.nameGroup});
   @override
   State<AddTaskGroup> createState() => _AddTaskGroupState();
 }
@@ -51,7 +56,8 @@ class _AddTaskGroupState extends State<AddTaskGroup> {
   TaskColor selectedColor = TaskColor.pink;
   Map<String, dynamic>? selectedCategory;
   UserModel? itemSelect;
-  final GlobalKey<AutoCompleteTextFieldState<UserModel>> _key =  GlobalKey<AutoCompleteTextFieldState<UserModel>>();
+  final GlobalKey<AutoCompleteTextFieldState<UserModel>> _key =
+      GlobalKey<AutoCompleteTextFieldState<UserModel>>();
 
   @override
   void initState() {
@@ -132,7 +138,7 @@ class _AddTaskGroupState extends State<AddTaskGroup> {
                     .where((element) => ([itemSelect].every((e) => (e?.id != element.id))))
                     .toList(),
                 clearOnSubmit: false,
-                textSubmitted: (_String){
+                textSubmitted: (_String) {
                   print(_String);
                 },
                 itemFilter: (item, query) =>
@@ -140,9 +146,7 @@ class _AddTaskGroupState extends State<AddTaskGroup> {
                 itemSorter: (a, b) => 1,
                 itemSubmitted: (item) => setState(() {
                   itemSelect = item;
-                  setState(() {
-
-                  });
+                  setState(() {});
                 }),
                 itemBuilder: (context, item) => ListTile(
                   title: Text(item.email ?? ""),
@@ -345,6 +349,13 @@ class _AddTaskGroupState extends State<AddTaskGroup> {
                     await dataController.addTaskToFirebase(_content.text, _description.text, color,
                         selectedPriority, selectedCategory, selectedDateEnd, selectedDateStart,
                         idUser: itemSelect?.id, idGroup: widget.idGroup, email: itemSelect?.email);
+                    NotifierController.addNotifier(NotifierModel(
+                      groupID: widget.idGroup,
+                      userID: itemSelect?.id,
+                      isSeen: false,
+                      nameGroup: widget.nameGroup,
+                      nameTask: _content.text,
+                    ));
                     EasyLoading.dismiss();
                     Navigator.of(context).pop(); // Đóng bottom sheet sau khi tạo task
                   },

@@ -1,8 +1,8 @@
 import 'package:app/AppColors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common.dart';
 import '../component/NoteComponent.dart';
@@ -22,9 +22,7 @@ class _SearchViewState extends State<SearchView> {
     if (_searchInput.text.trim() != "") {
       EasyLoading.show();
       final collectionRef = FirebaseFirestore.instance.collection('tasks');
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String userId = prefs.getString('userId') ?? "";
-      var querySnapshot = await collectionRef.where('userID', isEqualTo: userId).get();
+      var querySnapshot = await collectionRef.where('userID', isEqualTo: FirebaseAuth.instance.currentUser?.uid).get();
 
       // Xóa danh sách cũ trước khi thêm dữ liệu mới1
       listData = [];

@@ -1,36 +1,111 @@
-import 'package:app/model/Notification.dart';
+import 'package:app/AppColors.dart';
+import 'package:app/fire_base/notifier_controller.dart';
+import 'package:app/route_manager/route_manager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-class NotiView extends StatefulWidget {
-  const NotiView({super.key});
+import '../model/notifier_model.dart';
+
+class NotifierView extends StatefulWidget {
+  const NotifierView({super.key});
 
   @override
-  State<NotiView> createState() => _NotiViewState();
+  State<NotifierView> createState() => _NotifierViewState();
 }
 
-class _NotiViewState extends State<NotiView> {
-  final List<NotificationItem> notifications = [
-    NotificationItem(
-      title: 'Đến hạn làm nhiệm vụ',
-      message: 'Học mobile',
-    ),
-    // Thêm các thông báo khác vào đây
-  ];
+class _NotifierViewState extends State<NotifierView> {
+  List<NotifierModel> listData = [];
+  @override
+  void initState() {
+    functionListen();
+    super.initState();
+  }
+
+  void functionListen() {
+    DatabaseReference databaseReference =
+        FirebaseDatabase.instance.ref(FirebaseAuth.instance.currentUser?.uid);
+    databaseReference.onValue.listen((event) async {
+      listData = await NotifierController.getListData();
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.all(16),
-        child: Column(children: [
-          Text("Thông báo",
-              style: TextStyle(
-                  color: Colors.grey.shade800,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600)),
-          const SizedBox(
-            height: 20,
-          ),
-        ]),
+    return Scaffold(
+      appBar: AppBar(
+        leading: const SizedBox.shrink(),
+        leadingWidth: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Thông báo",
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ...List.generate(
+                listData.length,
+                (index) => GestureDetector(
+                      onTap: () async {
+                        EasyLoading.show();
+                        await NotifierController.update(listData[index].id ?? "");
+                        listData = await NotifierController.getListData();
+                        setState(() {});
+                        EasyLoading.dismiss();
+                        Navigator.pushNamed(context, RouteManager.groupTaskScreen,
+                            arguments: listData[index].groupID);
+                      },
+                      child: Stack(
+                        children: [
+                          Card(
+                            color: listData[index].isSeen == false ? AppColors.pinkSecond : null,
+                            margin: const EdgeInsets.all(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Bạn nhận được một task từ ${listData[index].nameGroup}",
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    Text("Tên task: ${listData[index].nameTask ?? ""}"),
+                                    const SizedBox(
+                                      height: 8,
+                                    ),
+                                    Text(
+                                        "Thời gian: ${listData[index].timeCreate.toString() ?? ""}"),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (listData[index].isSeen == false)
+                            Positioned(
+                                right: 15,
+                                top: 15,
+                                child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                                ))
+                        ],
+                      ),
+                    ))
+          ],
+        ),
       ),
     );
   }

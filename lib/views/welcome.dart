@@ -23,8 +23,7 @@ class _WelcomeState extends State<Welcome> {
     _email = TextEditingController();
     _password = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      String? userID = await FirebaseAuthProvider().getUserIdFromSharedPreferences();
-      if (userID != null) {
+      if (FirebaseAuth.instance.currentUser?.uid != null) {
         Navigator.pushNamed(context, RouteManager.homeRoute);
       }
     });
@@ -86,7 +85,7 @@ class _WelcomeState extends State<Welcome> {
               padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
               child: TextButton.icon(
                 onPressed: () async {
-                  await AuthController.SignInWithGG();
+                  await AuthController.SignInWithGG(context);
                 },
                 icon: const Icon(
                   Icons.login,

@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:app/AppColors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void showToast(String message, {ToastGravity gravity = ToastGravity.TOP}) {
   Fluttertoast.showToast(
@@ -79,14 +79,12 @@ void addCatetoryToFirestore(String name, String uid, String? groupID) async {
 
 Future<List<Map<String, dynamic>>> getAllCategories() async {
   List<Map<String, dynamic>> categories = [];
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String userId = prefs.getString('userId') ?? '';
 
-  if (userId.isNotEmpty) {
+  if (FirebaseAuth.instance.currentUser!= null) {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('categories')
-          .where('userID', isEqualTo: userId)
+          .where('userID', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
           .get();
 
       querySnapshot.docs.forEach((doc) {
@@ -106,14 +104,12 @@ Future<List<Map<String, dynamic>>> getAllCategories() async {
 
 Future<List<Map<String, dynamic>>> getUpcomingTasks() async {
   List<Map<String, dynamic>> upcomingTasks = [];
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String userId = prefs.getString('userId') ?? '';
   try {
     final DateTime currentDate = DateTime.now();
 
     final collectionRef = FirebaseFirestore.instance.collection('tasks');
     final querySnapshot = await collectionRef
-        .where('userID', isEqualTo: userId)
+        .where('userID', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
         .where('dateDone', isGreaterThanOrEqualTo: currentDate)
         .get();
 

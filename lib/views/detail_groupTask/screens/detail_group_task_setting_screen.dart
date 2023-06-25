@@ -1,4 +1,6 @@
 import 'package:app/AppColors.dart';
+import 'package:app/fire_base/notifier_controller.dart';
+import 'package:app/model/notifier_model.dart';
 import 'package:app/model/user_model.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -352,7 +354,8 @@ class _DetailGroupTaskSettingScreenState extends State<DetailGroupTaskSettingScr
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: AppColors.pink),
                   onPressed: () {
-                    showAddTaskGroupBottomSheet(context, userGroup, group?.id ?? "");
+                    showAddTaskGroupBottomSheet(context, userGroup, group?.id ?? "", group?.name??"" );
+
                   },
                   child: Text("Thêm Công việc"),
                 ),

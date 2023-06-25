@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _screens = [
     const NoteView(),
     const SearchView(),
-    const NotiView(),
+    const NotifierView(),
     const TimeScreen(),
     const SettingView(),
   ];

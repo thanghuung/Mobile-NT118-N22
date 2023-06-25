@@ -1,6 +1,7 @@
 import 'package:app/firebase_options.dart';
 import 'package:app/route_manager/route_manager.dart';
 import 'package:app/services/auth/firebase_auth_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -35,8 +36,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void>  checkLogin() async {
-    String? userID = await authClass.getUserIdFromSharedPreferences();
-    if (userID != null){
+
+    if (FirebaseAuth.instance.currentUser?.uid != null){
       setState(() {
         currentPage = RouteManager.homeRoute;
       });

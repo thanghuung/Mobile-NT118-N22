@@ -135,7 +135,7 @@ class _SettingViewState extends State<SettingView> {
                                       onPressed: () async {
                                         await AuthService.firebase().logOut();
                                         Navigator.of(context).pushNamedAndRemoveUntil(
-                                          loginRoute,
+                                          RouteManager.welcomeRoute,
                                           (_) => false,
                                         );
                                       },
@@ -214,68 +214,73 @@ class _SettingViewState extends State<SettingView> {
                               child: Text("dang tai.."),
                             );
                           }
-                          return GridView.count(
-                            primary: false,
-                            padding: const EdgeInsets.all(20),
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            crossAxisCount: 2,
-                            children: (snapshot.data ?? [])
-                                .map(
-                                  (group) => GestureDetector(
-                                    onTap: () async {
-                                      await Navigator.pushNamed(
-                                          context, RouteManager.groupTaskScreen,
-                                          arguments: group.id);
-                                      loadGroup();
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(Radius.circular(12)),
-                                          border: Border.all(color: AppColors.pink)),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          const SizedBox(
-                                            height: 4,
-                                          ),
-                                          Text(
-                                            group.name ?? "",
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              color: AppColors.pink,
-                                              fontWeight: FontWeight.w500,
+                          return RefreshIndicator(
+                            onRefresh: () async{
+                              loadGroup();
+                            },
+                            child: GridView.count(
+                              primary: false,
+                              padding: const EdgeInsets.all(20),
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              crossAxisCount: 2,
+                              children: (snapshot.data ?? [])
+                                  .map(
+                                    (group) => GestureDetector(
+                                      onTap: () async {
+                                        await Navigator.pushNamed(
+                                            context, RouteManager.groupTaskScreen,
+                                            arguments: group.id);
+                                        loadGroup();
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                            border: Border.all(color: AppColors.pink)),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            const SizedBox(
+                                              height: 4,
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(16),
-                                            child: Text(
-                                              group.des ?? "",
+                                            Text(
+                                              group.name ?? "",
                                               style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w300,
+                                                fontSize: 18,
+                                                color: AppColors.pink,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                             ),
-                                          ),
-                                          Expanded(
-                                            child: Row(
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Text("Thành viên: "),
-                                                Text((group.numUser ?? 0).toString())
-                                              ],
+                                            Padding(
+                                              padding: const EdgeInsets.all(16),
+                                              child: Text(
+                                                group.des ?? "",
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w300,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: 8,
-                                          )
-                                        ],
+                                            Expanded(
+                                              child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text("Thành viên: "),
+                                                  Text((group.numUser ?? 0).toString())
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 8,
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                )
-                                .toList(),
+                                  )
+                                  .toList(),
+                            ),
                           );
                         }),
                   )

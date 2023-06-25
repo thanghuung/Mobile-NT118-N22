@@ -1,7 +1,7 @@
 import 'package:app/model/group_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class GlobalData extends GetxController {
   // task
@@ -15,13 +15,12 @@ class GlobalData extends GetxController {
     todayTasks = <Map<String, dynamic>>[
       {"loading": true}
     ].obs;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('userId') ?? "";
+
     try {
       final DateTime currentDate = DateTime.now();
       final collectionRef = FirebaseFirestore.instance.collection('tasks');
       var querySnapshot = await collectionRef
-          .where('userID', isEqualTo: userId)
+          .where('userID', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
           // .where('dateDone', isLessThan: currentDate)
           .get();
 
@@ -52,10 +51,7 @@ class GlobalData extends GetxController {
   Future<void> addTaskToFirebase(
       String content, String description, String color, String priority, Map<String, dynamic>? category, DateTime? dateDone, DateTime? dateStart,
       {String? idUser, String? idGroup, String? email}) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userId = prefs.getString('userId') ?? '';
-    print(userId);
-    if (userId.isNotEmpty) {
+    if (FirebaseAuth.instance.currentUser?.uid != null) {
       try {
         // Lấy tham chiếu đến collection "tasks"
         final collectionRef = FirebaseFirestore.instance.collection('tasks');
@@ -76,7 +72,7 @@ class GlobalData extends GetxController {
           'dateDone': dateDone,
           'dateCreated': DateTime.now(),
           'dateStart': dateStart,
-          'userID': idUser ?? userId,
+          'userID': idUser ?? FirebaseAuth.instance.currentUser?.uid,
           'email': email,
         };
 

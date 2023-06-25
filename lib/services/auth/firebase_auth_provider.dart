@@ -2,7 +2,6 @@ import 'package:app/firebase_options.dart';
 import 'package:app/services/auth/auth_user.dart';
 import 'package:app/services/auth/auth_provider.dart';
 import 'package:app/services/auth/auth_exceptions.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -68,7 +67,7 @@ class FirebaseAuthProvider implements AuthProvider {
         email: email,
         password: password,
       );
-      await saveUserToSharedPreferences(userCredential);
+      // await saveUserToSharedPreferences(userCredential);
       final user = currentUser;
       if (user != null) {
         return user;
@@ -93,8 +92,6 @@ class FirebaseAuthProvider implements AuthProvider {
     final user = _auth.currentUser;
     if (user != null) {
       await _auth.signOut();
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.remove('userId');
     } else {
       throw UserNotLoggedInAuthException();
     }
@@ -105,7 +102,6 @@ class FirebaseAuthProvider implements AuthProvider {
     final user = _auth.currentUser;
     if (user != null) {
       await _auth.signOut();
-      await removeUserFromSharedPreferences();
     } else {
       throw UserNotLoggedInAuthException();
     }
@@ -118,23 +114,7 @@ class FirebaseAuthProvider implements AuthProvider {
     );
   }
 
-  Future<void> saveUserToSharedPreferences(
-      UserCredential userCredential) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('userId', userCredential.user!.uid);
-    // Lưu các thông tin khác của người dùng nếu cần
-  }
 
-  Future<String?> getUserIdFromSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('userId');
-  }
-
-  Future<void> removeUserFromSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('userId');
-    // Xóa các thông tin khác của người dùng nếu cần
-  }
 
   // Future<UserCredential?> signInWithGoogle() async {
   //   // Xác thực bằng Google
